@@ -56,7 +56,7 @@ export default function Summary({ stats }: any) {
                         <div className="grid grid-cols-2 gap-4 py-8">
                             <div className="col-span-2 p-6 bg-white/5 rounded-2xl border border-white/5">
                                 <p className="text-zinc-500 text-xs uppercase mb-1">Total Contributions</p>
-                                <p className="text-4xl font-black text-white">{stats.totalCommits.toLocaleString()}</p>
+                                +                                <p className="text-4xl font-black text-white">{(stats.totalCommits ?? 0).toLocaleString()}</p>
                             </div>
 
                             <div className="p-4 bg-gradient-to-br from-green-500/20 to-emerald-900/20 rounded-2xl border border-green-500/20">
