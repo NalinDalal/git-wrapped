@@ -11,10 +11,14 @@ interface Props {
 
 // All available slide types for the wrapped story
 const ALL_SLIDES: { id: WrappedSlide; label: string }[] = [
+    { id: "intro", label: "Introduction" },
     { id: "totalCommits", label: "Total Commits" },
     { id: "commitRank", label: "Rank" },
     { id: "topLanguages", label: "Top Languages" },
+    { id: "mostActiveDay", label: "Most Active Day" },
+    { id: "mostActiveMonth", label: "Most Active Month" },
     { id: "longestStreak", label: "Best Streak" },
+    { id: "starsEarned", label: "Stars Earned" },
     { id: "persona", label: "Persona Identity" },
     { id: "achievements", label: "Achievements" },
     { id: "summary", label: "Summary Card" },

@@ -1,11 +1,15 @@
 export type WrappedSlide =
+    | "intro"
     | "totalCommits"
     | "commitRank"
     | "topLanguages"
+    | "mostActiveDay"
+    | "mostActiveMonth"
     | "longestStreak"
+    | "starsEarned"
     | "summary"
-    | 'persona'
-    | 'achievements';
+    | "persona"
+    | "achievements";
 
 export interface WrappedConfig {
     theme: "neon" | "dark" | "minimal";
