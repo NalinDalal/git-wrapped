@@ -2,6 +2,10 @@
 import { motion, useSpring, useTransform } from "motion/react";
 import { useEffect } from "react";
 
+interface TotalCommitsStats {
+    totalCommits: number;
+}
+
 function Counter({ value }: { value: number }) {
     const spring = useSpring(0, { mass: 0.8, stiffness: 75, damping: 15 });
     const display = useTransform(spring, (current) => Math.round(current).toLocaleString());
@@ -13,7 +17,7 @@ function Counter({ value }: { value: number }) {
     return <motion.span>{display}</motion.span>;
 }
 
-export default function TotalCommits({ stats }: any) {
+export default function TotalCommits({ stats }: { stats: TotalCommitsStats }) {
     return (
         <div className="w-full h-full flex flex-col justify-center items-center p-8 bg-black relative overflow-hidden perspective-1000">
             {/* Hyper-speed Tunnel */}
