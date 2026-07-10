@@ -2,7 +2,15 @@
 import { motion } from "motion/react";
 import { calculateBadges } from "@/lib/gamification";
 
-export default function Achievements({ stats }: any) {
+interface AchievementsStats {
+    longestStreak: number;
+    topLanguages: Array<unknown>;
+    mostActiveDay: { name: string };
+    starsEarned: number;
+    commitRank: string;
+}
+
+export default function Achievements({ stats }: { stats: AchievementsStats }) {
     const badges = calculateBadges(stats);
 
     return (
@@ -24,15 +32,13 @@ export default function Achievements({ stats }: any) {
                             initial={{ x: -50, opacity: 0 }}
                             animate={{ x: 0, opacity: 1 }}
                             transition={{ delay: index * 0.1 }}
-                            className={`relative flex items-center gap-4 p-4 rounded-xl border ${
-                                badge.unlocked
+                            className={`relative flex items-center gap-4 p-4 rounded-xl border ${badge.unlocked
                                     ? "bg-white/5 border-white/10"
                                     : "bg-black/40 border-white/5 opacity-50 grayscale"
-                            }`}
+                                }`}
                         >
-                            <div className={`w-12 h-12 rounded-full flex items-center justify-center text-2xl ${
-                                badge.unlocked ? "bg-linear-to-br from-yellow-400/20 to-orange-500/20 border border-orange-500/30" : "bg-white/5"
-                            }`}>
+                            <div className={`w-12 h-12 rounded-full flex items-center justify-center text-2xl ${badge.unlocked ? "bg-linear-to-br from-yellow-400/20 to-orange-500/20 border border-orange-500/30" : "bg-white/5"
+                                }`}>
                                 {badge.icon}
                             </div>
 
