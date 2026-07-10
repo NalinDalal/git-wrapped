@@ -1,4 +1,5 @@
-export const defaultWrappedConfig = {
+import { WrappedConfig } from "./types/wrapped";
+export const defaultWrappedConfig: WrappedConfig = {
     theme: "neon",
     accentColor: "#ba0c0c",
     font: "Inter",
