@@ -75,7 +75,7 @@ export default function Home() {
                                     Git Wrapped
                                 </h1>
                                 <p className="text-white/50 text-lg">
-                                    Your 2025 coding story awaits.
+                                    Your {new Date().getFullYear()} coding story awaits.
                                 </p>
                             </div>
 

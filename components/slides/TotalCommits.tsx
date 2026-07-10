@@ -46,7 +46,7 @@ export default function TotalCommits({ stats }: { stats: GitHubStats }) {
                     animate={{ opacity: 1, y: 0 }}
                     className="inline-block px-4 py-1 rounded-full border border-white/30 bg-white/10 backdrop-blur-md text-xs font-bold uppercase tracking-widest mb-8"
                 >
-                    2025 Activity
+                    {new Date().getFullYear()} Activity
                 </motion.div>
 
                 <h1 className="text-8xl md:text-9xl font-black text-white tracking-tighter drop-shadow-[0_0_30px_rgba(255,255,255,0.5)]">

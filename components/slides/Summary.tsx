@@ -49,7 +49,7 @@ export default function Summary({ stats }: { stats: GitHubStats }) {
                             </div>
                             <div>
                                 <h2 className="font-bold text-xl text-white">Git Wrapped</h2>
-                                <p className="text-xs text-zinc-500 font-mono uppercase tracking-widest">2025 Edition</p>
+                                <p className="text-xs text-zinc-500 font-mono uppercase tracking-widest">{new Date().getFullYear()} Edition</p>
                             </div>
                         </div>
 
@@ -96,7 +96,7 @@ export default function Summary({ stats }: { stats: GitHubStats }) {
 
                     <div className="text-center mb-6 mt-4">
                         <h2 className="text-2xl font-black uppercase tracking-tighter">Git Wrapped</h2>
-                        <p className="text-xs uppercase">2025 Order #001</p>
+                        <p className="text-xs uppercase">{new Date().getFullYear()} Order #001</p>
                         <p className="text-xs">Served to: Developer</p>
                     </div>
 

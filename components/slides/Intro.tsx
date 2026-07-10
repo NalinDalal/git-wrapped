@@ -51,7 +51,7 @@ export default function Intro({ stats }: { stats: GitHubStats }) {
                     transition={{ delay: 0.6 }}
                     className="text-2xl text-white/50 font-light"
                 >
-                    Your 2025 coding story
+                    Your {new Date().getFullYear()} coding story
                 </motion.p>
 
                 <motion.div
