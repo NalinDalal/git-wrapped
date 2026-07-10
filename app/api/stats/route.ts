@@ -2,15 +2,6 @@ import { NextResponse } from "next/server";
 import { Octokit } from "@octokit/rest";
 import type { GitHubStats, ContributionDay } from "@/types/github";
 
-const GITHUB_TOKEN = process.env.GITHUB_TOKEN;
-if (!GITHUB_TOKEN) {
-  throw new Error("Missing GITHUB_TOKEN environment variable");
-}
-
-const octokit = new Octokit({
-  auth: GITHUB_TOKEN,
-});
-
 interface GraphQLResponse {
   user: {
     contributionsCollection: {
@@ -85,6 +76,16 @@ const MONTH_NAMES = [
  */
 export async function GET(request: Request): Promise<NextResponse> {
   try {
+    const GITHUB_TOKEN = process.env.GITHUB_TOKEN;
+    if (!GITHUB_TOKEN) {
+      return NextResponse.json(
+        { error: "Server configuration error" },
+        { status: 500 },
+      );
+    }
+
+    const octokit = new Octokit({ auth: GITHUB_TOKEN });
+
     // Extract username from query parameters
     const { searchParams } = new URL(request.url);
     const username = searchParams.get("username");
@@ -150,11 +151,11 @@ export async function GET(request: Request): Promise<NextResponse> {
     });
 
     // Find peak activity periods
-    const [mostActiveMonth] = Object.entries(monthlyCommits).sort(
+    const sortedMonths = Object.entries(monthlyCommits).sort(
       ([, a], [, b]) => b - a,
     );
 
-    const [mostActiveDay] = Object.entries(dailyCommits).sort(
+    const sortedDays = Object.entries(dailyCommits).sort(
       ([, a], [, b]) => b - a,
     );
 
@@ -165,7 +166,7 @@ export async function GET(request: Request): Promise<NextResponse> {
     );
 
     // Process programming language statistics
-    const languages = userData.repositories.nodes.reduce(
+    const languages = userData.repositories.nodes.reduce<Record<string, number>>(
       (acc, repo) => {
         if (repo.primaryLanguage?.name) {
           acc[repo.primaryLanguage.name] =
@@ -177,7 +178,7 @@ export async function GET(request: Request): Promise<NextResponse> {
     );
 
     const topLanguages = Object.entries(languages)
-      .sort(([, a], [, b]): number => (b as number) - (a as number))
+      .sort(([, a], [, b]) => b - a)
       .slice(0, 3)
       .map(([lang]) => lang);
 
@@ -196,20 +197,26 @@ export async function GET(request: Request): Promise<NextResponse> {
     const totalCommits =
       userData.contributionsCollection.contributionCalendar.totalContributions;
 
+    const sortedWeeks = contributionDays.length / 7 || 1;
+
     // Prepare and return the final statistics
     const stats: GitHubStats = {
       longestStreak: maxStreak,
       totalCommits,
       commitRank: getCommitRank(totalCommits),
       calendarData: contributionDays,
-      mostActiveDay: {
-        name: WEEKDAY_NAMES[parseInt(mostActiveDay[0])],
-        commits: Math.round(mostActiveDay[1] / (contributionDays.length / 7)), // Average per day
-      },
-      mostActiveMonth: {
-        name: MONTH_NAMES[parseInt(mostActiveMonth[0]) - 1],
-        commits: mostActiveMonth[1],
-      },
+      mostActiveDay: sortedDays.length > 0
+        ? {
+            name: WEEKDAY_NAMES[parseInt(sortedDays[0][0])],
+            commits: Math.round(sortedDays[0][1] / sortedWeeks),
+          }
+        : { name: "N/A", commits: 0 },
+      mostActiveMonth: sortedMonths.length > 0
+        ? {
+            name: MONTH_NAMES[parseInt(sortedMonths[0][0]) - 1],
+            commits: sortedMonths[0][1],
+          }
+        : { name: "N/A", commits: 0 },
       starsEarned: totalStars,
       topLanguages,
     };
