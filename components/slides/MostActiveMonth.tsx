@@ -1,5 +1,6 @@
 "use client";
 import { motion } from "motion/react";
+import type { GitHubStats } from "@/types/github";
 
 const monthAbbr: Record<string, string> = {
     January: "JAN", February: "FEB", March: "MAR", April: "APR",
@@ -7,7 +8,7 @@ const monthAbbr: Record<string, string> = {
     September: "SEP", October: "OCT", November: "NOV", December: "DEC",
 };
 
-export default function MostActiveMonth({ stats }: any) {
+export default function MostActiveMonth({ stats }: { stats: GitHubStats }) {
     const month = stats.mostActiveMonth || "January";
 
     return (

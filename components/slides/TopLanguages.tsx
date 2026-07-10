@@ -1,12 +1,13 @@
 "use client";
 import { motion } from "motion/react";
+import type { GitHubStats } from "@/types/github";
 
 const languagesColors: Record<string, string> = {
     TypeScript: "#3178c6", JavaScript: "#f7df1e", Python: "#3776ab",
     Go: "#00add8", Rust: "#dea584", HTML: "#e34c26", CSS: "#563d7c", default: "#888888"
 };
 
-export default function TopLanguages({ stats }: any) {
+export default function TopLanguages({ stats }: { stats: GitHubStats }) {
     const languages = stats.topLanguages || [];
 
     return (

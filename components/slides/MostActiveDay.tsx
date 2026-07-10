@@ -1,5 +1,6 @@
 "use client";
 import { motion } from "motion/react";
+import type { GitHubStats } from "@/types/github";
 
 const dayColors: Record<string, string> = {
     Monday: "from-blue-500 to-cyan-500",
@@ -11,7 +12,7 @@ const dayColors: Record<string, string> = {
     Sunday: "from-teal-500 to-cyan-500",
 };
 
-export default function MostActiveDay({ stats }: any) {
+export default function MostActiveDay({ stats }: { stats: GitHubStats }) {
     const day = stats.mostActiveDay || "Monday";
     const colorClass = dayColors[day] || "from-purple-500 to-blue-500";
 

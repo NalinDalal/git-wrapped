@@ -10,10 +10,11 @@ import MostActiveDay from "./slides/MostActiveDay";
 import MostActiveMonth from "./slides/MostActiveMonth";
 import StarsEarned from "./slides/StarsEarned";
 import { WrappedSlide } from "@/types/wrapped";
+import type { GitHubStats } from "@/types/github";
 
 interface SlideRendererProps {
     slide: WrappedSlide;
-    stats: any; // TODO: Define proper GitHubStats interface
+    stats: GitHubStats;
     onNext?: () => void;
 }
 

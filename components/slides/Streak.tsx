@@ -1,13 +1,10 @@
 "use client";
 import { motion } from "motion/react";
 import { useMemo } from "react";
-
-interface StreakStats {
-    longestStreak: number;
-}
+import type { GitHubStats } from "@/types/github";
 
 
-export default function Streak({ stats }: { stats: StreakStats }) {
+export default function Streak({ stats }: { stats: GitHubStats }) {
 
     const barHeights = useMemo(() =>
         [...Array(7)].map(() => Math.random() * 40 + 20),

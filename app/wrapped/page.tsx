@@ -5,11 +5,13 @@ import {useRouter} from "next/navigation";
 import {AnimatePresence, motion} from "motion/react";
 import SlideRenderer from "@/components/SlideRenderer";
 import {X, Pause} from "lucide-react";
+import type { WrappedConfig } from "@/types/wrapped";
+import type { GitHubStats } from "@/types/github";
 
 const SLIDE_DURATION = 5000;
 export default function WrappedPage() {
     const router = useRouter();
-    const [data, setData] = useState<{ stats: any; config: any } | null>(null);
+    const [data, setData] = useState<{ stats: GitHubStats; config: WrappedConfig } | null>(null);
     const [currentSlideIndex, setCurrentSlideIndex] = useState(0);
     const [isPaused, setIsPaused] = useState(false);
 

@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { Octokit } from "@octokit/rest";
+import type { GitHubStats, ContributionDay } from "@/types/github";
 
 const GITHUB_TOKEN = process.env.GITHUB_TOKEN;
 if (!GITHUB_TOKEN) {
@@ -10,27 +11,25 @@ const octokit = new Octokit({
   auth: GITHUB_TOKEN,
 });
 
-interface ContributionDay {
-  contributionCount: number;
-  date: string;
-  weekday: number;
-}
-
-interface GitHubStats {
-  longestStreak: number;
-  totalCommits: number;
-  commitRank: string;
-  calendarData: ContributionDay[];
-  mostActiveDay: {
-    name: string;
-    commits: number;
+interface GraphQLResponse {
+  user: {
+    contributionsCollection: {
+      contributionCalendar: {
+        totalContributions: number;
+        weeks: Array<{
+          contributionDays: ContributionDay[];
+        }>;
+      };
+    };
+    repositories: {
+      nodes: Array<{
+        stargazerCount: number;
+        primaryLanguage: {
+          name: string;
+        } | null;
+      }>;
+    };
   };
-  mostActiveMonth: {
-    name: string;
-    commits: number;
-  };
-  starsEarned: number;
-  topLanguages: string[];
 }
 
 /**
@@ -125,14 +124,14 @@ export async function GET(request: Request): Promise<NextResponse> {
       }
     `;
 
-    const graphqlResponse = (await octokit.graphql(query, { username })) as any;
+    const graphqlResponse = (await octokit.graphql(query, { username })) as GraphQLResponse;
     const userData = graphqlResponse.user;
 
     // Process contribution data for the current year
     const contributionDays =
       userData.contributionsCollection.contributionCalendar.weeks
-        .flatMap((week: any) => week.contributionDays)
-        .filter((day: any) => new Date(day.date) >= new Date("2024-01-01"));
+        .flatMap((week) => week.contributionDays)
+        .filter((day) => new Date(day.date) >= new Date("2024-01-01"));
 
     // Calculate monthly contribution statistics
     const monthlyCommits: Record<string, number> = {};
@@ -161,13 +160,13 @@ export async function GET(request: Request): Promise<NextResponse> {
 
     // Calculate repository statistics
     const totalStars = userData.repositories.nodes.reduce(
-      (acc: number, repo: any) => acc + repo.stargazerCount,
+      (acc, repo) => acc + repo.stargazerCount,
       0,
     );
 
     // Process programming language statistics
     const languages = userData.repositories.nodes.reduce(
-      (acc: Record<string, number>, repo: any) => {
+      (acc, repo) => {
         if (repo.primaryLanguage?.name) {
           acc[repo.primaryLanguage.name] =
             (acc[repo.primaryLanguage.name] || 0) + 1;
@@ -216,10 +215,11 @@ export async function GET(request: Request): Promise<NextResponse> {
     };
 
     return NextResponse.json(stats);
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Error fetching GitHub stats:", error);
+    const errorMessage = error instanceof Error ? error.message : "Failed to fetch GitHub statistics";
     return NextResponse.json(
-      { error: error.message || "Failed to fetch GitHub statistics" },
+      { error: errorMessage },
       { status: 500 },
     );
   }

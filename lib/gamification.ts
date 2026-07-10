@@ -1,5 +1,7 @@
 // lib/gamification.ts
 
+import type { GitHubStats } from "@/types/github";
+
 export type PersonaType = "The Machine" | "The Architect" | "The Fixer" | "The Artist" | "The Ghost";
 
 interface Badge {
@@ -10,7 +12,7 @@ interface Badge {
     unlocked: boolean;
 }
 
-export function calculatePersona(stats: any) {
+export function calculatePersona(stats: GitHubStats) {
     const { totalCommits, longestStreak, topLanguages, starsEarned } = stats;
 
     // Power Levels (0-100)
@@ -42,7 +44,7 @@ export function calculatePersona(stats: any) {
     return { class: characterClass, quote, power };
 }
 
-export function calculateBadges(stats: any): Badge[] {
+export function calculateBadges(stats: GitHubStats): Badge[] {
     return [
         {
             id: "streak_master",

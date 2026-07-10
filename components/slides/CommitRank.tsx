@@ -1,8 +1,9 @@
 "use client";
 import { motion, useMotionValue, useSpring, useTransform } from "motion/react";
 import React from "react";
+import type { GitHubStats } from "@/types/github";
 
-export default function CommitRank({ stats }: any) {
+export default function CommitRank({ stats }: { stats: GitHubStats }) {
     const x = useMotionValue(0);
     const y = useMotionValue(0);
 

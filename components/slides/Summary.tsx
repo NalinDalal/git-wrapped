@@ -1,8 +1,9 @@
 "use client";
 import { motion } from "motion/react";
 import { useState } from "react";
+import type { GitHubStats } from "@/types/github";
 
-export default function Summary({ stats }: any) {
+export default function Summary({ stats }: { stats: GitHubStats }) {
     const [mode, setMode] = useState<"card" | "receipt">("card");
 
     return (

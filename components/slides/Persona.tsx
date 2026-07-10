@@ -10,10 +10,11 @@ import {
     Filler,
     Tooltip,
 } from "chart.js";
+import type { GitHubStats } from "@/types/github";
 
 ChartJS.register(RadialLinearScale, PointElement, LineElement, Filler, Tooltip);
 
-export default function Persona({ stats }: any) {
+export default function Persona({ stats }: { stats: GitHubStats }) {
     const persona = calculatePersona(stats);
 
     const data = {

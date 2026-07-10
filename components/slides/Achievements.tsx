@@ -1,16 +1,9 @@
 "use client";
 import { motion } from "motion/react";
 import { calculateBadges } from "@/lib/gamification";
+import type { GitHubStats } from "@/types/github";
 
-interface AchievementsStats {
-    longestStreak: number;
-    topLanguages: Array<unknown>;
-    mostActiveDay: { name: string };
-    starsEarned: number;
-    commitRank: string;
-}
-
-export default function Achievements({ stats }: { stats: AchievementsStats }) {
+export default function Achievements({ stats }: { stats: GitHubStats }) {
     const badges = calculateBadges(stats);
 
     return (

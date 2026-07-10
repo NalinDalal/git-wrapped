@@ -7,11 +7,12 @@ import { Input } from "@/components/ui/input";
 import CustomizePanel from "@/components/CustomizePanel";
 import { useRouter } from "next/navigation";
 import type { WrappedConfig } from "@/types/wrapped";
+import type { GitHubStats } from "@/types/github";
 import { Github, Play, Settings2, Sparkles } from "lucide-react";
 
 export default function Home() {
     const [username, setUsername] = useState("");
-    const [stats, setStats] = useState<any>(null);
+    const [stats, setStats] = useState<GitHubStats | null>(null);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const [showCustomize, setShowCustomize] = useState(false);

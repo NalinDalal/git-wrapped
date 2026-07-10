@@ -1,8 +1,9 @@
 "use client";
 import { motion } from "motion/react";
 import { Github } from "lucide-react";
+import type { GitHubStats } from "@/types/github";
 
-export default function Intro({ stats }: any) {
+export default function Intro({ stats }: { stats: GitHubStats }) {
     return (
         <div className="w-full h-full flex flex-col justify-center items-center bg-black relative overflow-hidden">
             {/* Animated background rings */}

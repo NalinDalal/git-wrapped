@@ -1,10 +1,7 @@
 "use client";
 import { motion, useSpring, useTransform } from "motion/react";
 import { useEffect } from "react";
-
-interface TotalCommitsStats {
-    totalCommits: number;
-}
+import type { GitHubStats } from "@/types/github";
 
 function Counter({ value }: { value: number }) {
     const spring = useSpring(0, { mass: 0.8, stiffness: 75, damping: 15 });
@@ -17,7 +14,7 @@ function Counter({ value }: { value: number }) {
     return <motion.span>{display}</motion.span>;
 }
 
-export default function TotalCommits({ stats }: { stats: TotalCommitsStats }) {
+export default function TotalCommits({ stats }: { stats: GitHubStats }) {
     return (
         <div className="w-full h-full flex flex-col justify-center items-center p-8 bg-black relative overflow-hidden perspective-1000">
             {/* Hyper-speed Tunnel */}

@@ -2,6 +2,7 @@
 import { motion, useSpring, useTransform } from "motion/react";
 import { useEffect } from "react";
 import { Star } from "lucide-react";
+import type { GitHubStats } from "@/types/github";
 
 function Counter({ value }: { value: number }) {
     const spring = useSpring(0, { mass: 0.8, stiffness: 75, damping: 15 });
@@ -14,7 +15,7 @@ function Counter({ value }: { value: number }) {
     return <motion.span>{display}</motion.span>;
 }
 
-export default function StarsEarned({ stats }: any) {
+export default function StarsEarned({ stats }: { stats: GitHubStats }) {
     const stars = stats.starsEarned || 0;
 
     return (
