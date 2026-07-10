@@ -52,7 +52,7 @@ export default function CommitRank({ stats }: { stats: GitHubStats }) {
                             </div>
                             <div className="text-right">
                                 <p className="text-xs uppercase tracking-widest text-zinc-500 font-bold">Rank</p>
-                                <p className="text-sm font-mono text-white/70">#2025</p>
+                                <p className="text-sm font-mono text-white/70">#{new Date().getFullYear()}</p>
                             </div>
                         </div>
 

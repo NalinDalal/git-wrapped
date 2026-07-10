@@ -65,7 +65,6 @@ export default function WrappedPage() {
             setCurrentSlideIndex((prev) => prev + 1);
             resetTimer();
         } else {
-            console.log("Story Finished");
             router.push("/");
         }
     }, [currentSlideIndex, data, router]);

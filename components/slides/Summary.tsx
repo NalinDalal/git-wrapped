@@ -1,10 +1,16 @@
 "use client";
 import { motion } from "motion/react";
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import type { GitHubStats } from "@/types/github";
 
 export default function Summary({ stats }: { stats: GitHubStats }) {
     const [mode, setMode] = useState<"card" | "receipt">("card");
+    const barcodeBars = useMemo(() =>
+        Array.from({ length: 20 }, () => ({
+            width: Math.random() > 0.5 ? 4 : 2,
+            opacity: Math.random() > 0.3 ? 1 : 0.5,
+        })),
+    []);
 
     return (
         <div className="w-full h-full flex flex-col items-center justify-center bg-[#050505] p-6 relative">
@@ -128,14 +134,14 @@ export default function Summary({ stats }: { stats: GitHubStats }) {
                         <p className="text-[10px] mt-2">THANK YOU FOR CODING</p>
                         <div className="mt-4 flex justify-center opacity-80">
                             <div className="h-8 w-48 flex gap-1 justify-center">
-                                {[...Array(20)].map((_, i) => (
+                                {barcodeBars.map((bar, i) => (
                                     <div
                                         key={i}
                                         className="bg-black"
                                         style={{
-                                            width: Math.random() > 0.5 ? 4 : 2,
+                                            width: bar.width,
                                             height: "100%",
-                                            opacity: Math.random() > 0.3 ? 1 : 0.5
+                                            opacity: bar.opacity,
                                         }}
                                     />
                                 ))}
