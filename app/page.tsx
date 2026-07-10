@@ -1,231 +1,190 @@
 "use client";
-import Image from "next/image";
-import { Inter } from "next/font/google";
-import { useState } from "react";
-import dynamic from "next/dynamic";
 
-const ReactJson = dynamic(() => import("react-json-view"), { ssr: false });
-const inter = Inter({ subsets: ["latin"] });
+import { useState } from "react";
+import { motion, AnimatePresence } from "motion/react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import CustomizePanel from "@/components/CustomizePanel";
+import { useRouter } from "next/navigation";
+import type { WrappedConfig } from "@/types/wrapped";
+import { Github, Play, Settings2, Sparkles } from "lucide-react";
 
 export default function Home() {
-  const [username, setUsername] = useState("");
-  const [stats, setStats] = useState(null);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
+    const [username, setUsername] = useState("");
+    const [stats, setStats] = useState<any>(null);
+    const [loading, setLoading] = useState(false);
+    const [showCustomize, setShowCustomize] = useState(false);
+    const router = useRouter();
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setLoading(true);
-    setError("");
-    setStats(null);
-
-    try {
-      const response = await fetch(`/api/stats?username=${username}`);
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.error || "Failed to fetch stats");
-      }
-
-      setStats(data);
-    } catch (err: any) {
-      setError(err.message);
-    } finally {
-      setLoading(false);
+    async function handleFetch(e?: React.FormEvent) {
+        e?.preventDefault();
+        if (!username) return;
+        setLoading(true);
+        try {
+            const res = await fetch(`/api/stats?username=${username}`);
+            const data = await res.json();
+            setStats(data);
+        } catch (error) {
+            console.error(error);
+        }
+        setLoading(false);
     }
-  };
 
-  return (
-    <main
-      className={`min-h-screen bg-gradient-to-br from-gray-900 to-gray-800 text-gray-100 ${inter.className}`}
-    >
-      <style jsx global>{`
-        /* Modern scrollbar styling */
-        ::-webkit-scrollbar {
-          width: 10px;
-          height: 10px;
-        }
+    const handleGenerate = (config: WrappedConfig) => {
+        sessionStorage.setItem("wrappedConfig", JSON.stringify(config));
+        sessionStorage.setItem("wrappedStats", JSON.stringify(stats));
+        router.push("/wrapped");
+    };
 
-        ::-webkit-scrollbar-track {
-          background: rgba(15, 23, 42, 0.1);
-          border-radius: 8px;
-        }
-
-        ::-webkit-scrollbar-thumb {
-          background: linear-gradient(
-            to bottom,
-            rgba(214, 188, 250, 0.5),
-            rgba(245, 208, 254, 0.5)
-          );
-          border-radius: 8px;
-          border: 2px solid rgba(15, 23, 42, 0.1);
-        }
-
-        ::-webkit-scrollbar-thumb:hover {
-          background: linear-gradient(
-            to bottom,
-            rgba(214, 188, 250, 0.8),
-            rgba(245, 208, 254, 0.8)
-          );
-        }
-
-        /* Firefox */
-        * {
-          scrollbar-width: thin;
-          scrollbar-color: rgba(214, 188, 250, 0.5) rgba(15, 23, 42, 0.1);
-        }
-      `}</style>
-
-      {/* Subtle Pattern Overlay */}
-      <div
-        className="fixed inset-0 opacity-5 pointer-events-none"
-        style={{
-          backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.4'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`,
-        }}
-      ></div>
-
-      {/* Header */}
-      <header className="border-b border-gray-700/50 backdrop-blur-sm bg-gray-900/50 sticky top-0 z-50">
-        <div className="container mx-auto px-4 py-4 flex items-center gap-3">
-          <Image
-            src="https://ph-files.imgix.net/8f799c72-b5f2-48c5-a134-143281cc0502.vnd.microsoft.icon"
-            alt="Git Wrapped Logo"
-            width={40}
-            height={40}
-            className="rounded-lg"
-          />
-          <h1 className="text-2xl font-bold">Git Wrapped API</h1>
-        </div>
-      </header>
-
-      {/* Main Content */}
-      <div className="container mx-auto px-4 py-12">
-        <div className="max-w-7xl mx-auto">
-          <div className="grid md:grid-cols-5 gap-8">
-            {/* Left Column - Input Form */}
-            <div className="md:col-span-2 space-y-6">
-              <form onSubmit={handleSubmit} className="space-y-4">
-                <div className="flex flex-col gap-2">
-                  <label
-                    htmlFor="username"
-                    className="text-sm font-medium text-gray-300"
-                  >
-                    GitHub Username
-                  </label>
-                  <div className="relative">
-                    <input
-                      type="text"
-                      id="username"
-                      value={username}
-                      onChange={(e) => setUsername(e.target.value)}
-                      className="w-full px-4 py-3 bg-gray-800/50 border border-gray-700 rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-cyan-500 outline-none placeholder-gray-500 backdrop-blur-sm"
-                      placeholder="Enter GitHub username"
-                      required
-                    />
-                    <div className="absolute inset-0 -z-10 bg-gradient-to-r from-indigo-500 to-cyan-500 rounded-lg blur opacity-20"></div>
-                  </div>
-                </div>
-                <button
-                  type="submit"
-                  disabled={loading}
-                  className="w-full bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white font-medium py-3 px-4 rounded-lg transition-all disabled:opacity-50 transform hover:scale-[1.02] active:scale-[0.98]"
-                >
-                  {loading ? (
-                    <span className="flex items-center justify-center gap-2">
-                      <svg className="animate-spin h-5 w-5" viewBox="0 0 24 24">
-                        <circle
-                          className="opacity-25"
-                          cx="12"
-                          cy="12"
-                          r="10"
-                          stroke="currentColor"
-                          strokeWidth="4"
-                          fill="none"
-                        />
-                        <path
-                          className="opacity-75"
-                          fill="currentColor"
-                          d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                        />
-                      </svg>
-                      Loading...
-                    </span>
-                  ) : (
-                    "Get Stats"
-                  )}
-                </button>
-              </form>
-
-              {/* Error Message */}
-              {error && (
-                <div className="bg-red-900/20 border border-red-500/20 text-red-400 px-4 py-3 rounded-lg backdrop-blur-sm">
-                  {error}
-                </div>
-              )}
+    return (
+        <main className="min-h-screen bg-[#050505] text-white overflow-hidden relative selection:bg-purple-500/30">
+            {/* Ambient Background */}
+            <div className="absolute inset-0 pointer-events-none">
+                <div className="absolute top-[-20%] left-[-10%] w-[50vw] h-[50vw] bg-purple-900/20 rounded-full blur-[120px] animate-pulse" />
+                <div className="absolute bottom-[-20%] right-[-10%] w-[50vw] h-[50vw] bg-blue-900/10 rounded-full blur-[120px]" />
             </div>
 
-            {/* Right Column - Results */}
-            <div className="md:col-span-3 relative min-h-[400px] flex items-center justify-center">
-              {!stats && !loading && (
-                <div className="w-full h-full text-center flex items-center justify-center bg-gray-800/30 border border-purple-500/20 rounded-lg backdrop-blur-sm">
-                  <div className="space-y-4 p-8">
-                    <div className="w-16 h-16 mx-auto bg-gradient-to-r from-purple-500/20 to-pink-500/20 rounded-full flex items-center justify-center">
-                      <svg
-                        className="w-8 h-8 text-gray-400"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                        xmlns="http://www.w3.org/2000/svg"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-                        />
-                      </svg>
-                    </div>
-                    <div>
-                      <h3 className="text-lg font-medium text-gray-200 mb-1">
-                        No Stats Found
-                      </h3>
-                      <p className="text-gray-400">
-                        Enter a GitHub username to view API response
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              )}
-              {stats && (
-                <div className="w-full h-full bg-gray-800/30 border border-purple-500/20 rounded-lg backdrop-blur-sm">
-                  <div className="p-4 border-b border-purple-500/20">
-                    <h2 className="text-lg font-medium text-transparent bg-clip-text bg-gradient-to-r from-purple-200 to-pink-200">
-                      Results for @{username}
-                    </h2>
-                  </div>
-                  <div className="p-4 overflow-auto max-h-[600px] rounded-lg">
-                    <ReactJson
-                      src={stats}
-                      theme="tomorrow"
-                      style={{
-                        backgroundColor: "transparent",
-                        fontFamily:
-                          'ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace',
-                        fontSize: "0.875rem",
-                      }}
-                      enableClipboard={false}
-                      displayDataTypes={false}
-                      displayObjectSize={false}
-                      collapsed={1}
-                      name={false}
-                    />
-                  </div>
-                </div>
-              )}
+            <div className="relative z-10 container mx-auto px-4 h-screen flex flex-col items-center justify-center">
+                <AnimatePresence mode="wait">
+                    {!stats ? (
+                        // STATE 1: INPUT
+                        <motion.div
+                            key="input"
+                            initial={{ opacity: 0, y: 20 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            exit={{ opacity: 0, y: -20 }}
+                            className="w-full max-w-md text-center space-y-8"
+                        >
+                            <div className="space-y-2">
+                                <motion.div
+                                    initial={{ scale: 0.9 }}
+                                    animate={{ scale: 1 }}
+                                    className="inline-block p-3 rounded-2xl bg-white/5 border border-white/10 mb-4"
+                                >
+                                    <Github className="w-8 h-8" />
+                                </motion.div>
+                                <h1 className="text-5xl font-black tracking-tighter bg-gradient-to-br from-white to-white/50 bg-clip-text text-transparent">
+                                    Git Wrapped
+                                </h1>
+                                <p className="text-white/50 text-lg">
+                                    Your 2025 coding story awaits.
+                                </p>
+                            </div>
+
+                            <form onSubmit={handleFetch} className="relative group">
+                                <div className="absolute -inset-1 bg-gradient-to-r from-purple-600 to-blue-600 rounded-xl blur opacity-25 group-hover:opacity-50 transition duration-500" />
+                                <div className="relative flex gap-2 bg-[#0A0A0A] p-2 rounded-xl border border-white/10">
+                                    <Input
+                                        placeholder="github_username"
+                                        value={username}
+                                        onChange={(e) => setUsername(e.target.value)}
+                                        className="bg-transparent border-none text-lg h-12 focus-visible:ring-0 placeholder:text-white/20"
+                                    />
+                                    <Button
+                                        type="submit"
+                                        disabled={loading}
+                                        className="h-12 px-8 bg-white text-black hover:bg-gray-200 font-bold rounded-lg transition-all"
+                                    >
+                                        {loading ? (
+                                            <div className="w-5 h-5 border-2 border-black/30 border-t-black rounded-full animate-spin" />
+                                        ) : (
+                                            "Reveal"
+                                        )}
+                                    </Button>
+                                </div>
+                            </form>
+                        </motion.div>
+                    ) : (
+                        // STATE 2: PREVIEW & CUSTOMIZE
+                        <motion.div
+                            key="preview"
+                            initial={{ opacity: 0, scale: 0.95 }}
+                            animate={{ opacity: 1, scale: 1 }}
+                            className="w-full max-w-4xl grid md:grid-cols-2 gap-12 items-center"
+                        >
+                            {/* Left: The "Cover" Card */}
+                            <div className="order-2 md:order-1 relative aspect-[4/5] md:aspect-square max-h-[600px] w-full">
+                                <div className="absolute inset-0 bg-gradient-to-br from-purple-500/10 to-blue-500/10 rounded-[2rem] blur-xl" />
+                                <div className="relative h-full bg-[#0A0A0A]/90 backdrop-blur-xl border border-white/10 rounded-[2rem] p-8 flex flex-col justify-between overflow-hidden group">
+                                    {/* Decorative Noise/Grain could go here */}
+
+                                    <div className="space-y-1">
+                                        <p className="text-sm font-medium text-white/50 uppercase tracking-widest">2025 Wrapped</p>
+                                        <h2 className="text-3xl font-bold">@{username}</h2>
+                                    </div>
+
+                                    <div className="space-y-4">
+                                        <div className="flex items-baseline gap-2">
+                                            <span className="text-6xl font-black text-white">
+                                                {stats.totalCommits}
+                                            </span>
+                                            <span className="text-xl text-white/50">commits</span>
+                                        </div>
+                                        <div className="h-1 w-full bg-white/10 rounded-full overflow-hidden">
+                                            <motion.div
+                                                initial={{ width: 0 }}
+                                                animate={{ width: "100%" }}
+                                                transition={{ duration: 1.5, ease: "easeOut" }}
+                                                className="h-full bg-gradient-to-r from-purple-500 to-blue-500"
+                                            />
+                                        </div>
+                                    </div>
+
+                                    <div className="flex justify-between items-end">
+                                        <div className="bg-white/5 px-4 py-2 rounded-full border border-white/10">
+                                            <span className="text-sm font-medium">{stats.commitRank}</span>
+                                        </div>
+                                        <Sparkles className="w-8 h-8 text-yellow-400 opacity-50 group-hover:opacity-100 transition-opacity" />
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* Right: Controls */}
+                            <div className="order-1 md:order-2 space-y-8">
+                                <div className="space-y-2">
+                                    <h2 className="text-3xl font-bold">Your Year in Code</h2>
+                                    <p className="text-white/50">Ready to watch your story?</p>
+                                </div>
+
+                                <div className="flex flex-col gap-3">
+                                    {/* We use a hidden generated config or a default one if CustomizePanel isn't shown */}
+                                    {!showCustomize ? (
+                                        <>
+                                            <Button
+                                                onClick={() => handleGenerate({ theme: "neon", slides: ["totalCommits", "commitRank", "topLanguages", "longestStreak", "summary"] })}
+                                                className="h-14 text-lg bg-white text-black hover:bg-gray-200 rounded-xl font-bold flex items-center gap-2 justify-center group"
+                                            >
+                                                <Play className="w-5 h-5 fill-current group-hover:scale-110 transition-transform" />
+                                                Play Wrapped
+                                            </Button>
+                                            <Button
+                                                variant="outline"
+                                                onClick={() => setShowCustomize(true)}
+                                                className="h-14 text-lg border-white/10 hover:bg-white/5 hover:text-white rounded-xl flex items-center gap-2 justify-center"
+                                            >
+                                                <Settings2 className="w-5 h-5" />
+                                                Customize
+                                            </Button>
+                                        </>
+                                    ) : (
+                                        <motion.div
+                                            initial={{ opacity: 0, y: 10 }}
+                                            animate={{ opacity: 1, y: 0 }}
+                                            className="bg-[#111] p-6 rounded-2xl border border-white/10"
+                                        >
+                                            <div className="flex justify-between items-center mb-4">
+                                                <h3 className="font-semibold">Story Settings</h3>
+                                                <button onClick={() => setShowCustomize(false)} className="text-xs text-white/50 hover:text-white">Close</button>
+                                            </div>
+                                            <CustomizePanel stats={stats} onGenerate={handleGenerate} />
+                                        </motion.div>
+                                    )}
+                                </div>
+                            </div>
+                        </motion.div>
+                    )}
+                </AnimatePresence>
             </div>
-          </div>
-        </div>
-      </div>
-    </main>
-  );
+        </main>
+    );
 }
