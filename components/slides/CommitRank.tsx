@@ -24,8 +24,7 @@ export default function CommitRank({ stats }: any) {
         y.set(yPct);
     }
 
-    const isElite = stats.commitRank.includes("0.5") || stats.commitRank.includes("1%");
-
+    const isElite = stats.commitRank?.includes("0.5") || stats.commitRank?.includes("1%");
     return (
         <div
             className="w-full h-full flex items-center justify-center bg-[#050505] overflow-hidden"
