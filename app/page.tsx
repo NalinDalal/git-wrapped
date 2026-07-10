@@ -13,6 +13,7 @@ export default function Home() {
     const [username, setUsername] = useState("");
     const [stats, setStats] = useState<any>(null);
     const [loading, setLoading] = useState(false);
+    const [error, setError] = useState<string | null>(null);
     const [showCustomize, setShowCustomize] = useState(false);
     const router = useRouter();
 
@@ -20,12 +21,17 @@ export default function Home() {
         e?.preventDefault();
         if (!username) return;
         setLoading(true);
+        setError(null);
         try {
             const res = await fetch(`/api/stats?username=${username}`);
+            if (!res.ok) {
+                throw new Error(res.status === 404 ? "User not found" : "Failed to fetch stats");
+            }
             const data = await res.json();
             setStats(data);
         } catch (error) {
             console.error(error);
+            setError(error instanceof Error ? error.message : "An error occurred");
         }
         setLoading(false);
     }
