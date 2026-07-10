@@ -9,7 +9,8 @@ const monthAbbr: Record<string, string> = {
 };
 
 export default function MostActiveMonth({ stats }: { stats: GitHubStats }) {
-    const month = stats.mostActiveMonth || "January";
+    const monthName = stats.mostActiveMonth?.name || "January";
+    const commitCount = stats.mostActiveMonth?.commits || 0;
 
     return (
         <div className="w-full h-full flex flex-col justify-center items-center bg-black relative overflow-hidden">
@@ -38,7 +39,7 @@ export default function MostActiveMonth({ stats }: { stats: GitHubStats }) {
                     className="mb-8"
                 >
                     <div className="text-9xl font-black text-transparent bg-clip-text bg-gradient-to-br from-white via-white to-white/30 leading-none">
-                        {monthAbbr[month] || "JAN"}
+                        {monthAbbr[monthName] || "JAN"}
                     </div>
                 </motion.div>
 
@@ -48,7 +49,7 @@ export default function MostActiveMonth({ stats }: { stats: GitHubStats }) {
                     transition={{ delay: 0.3 }}
                     className="text-3xl font-bold text-white mb-4"
                 >
-                    {month}
+                    {monthName}
                 </motion.h2>
 
                 <motion.div
@@ -58,7 +59,7 @@ export default function MostActiveMonth({ stats }: { stats: GitHubStats }) {
                     className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/10 border border-white/20"
                 >
                     <span className="text-2xl">🚀</span>
-                    <span className="text-white/70">{stats.mostActiveMonthCommits || "Peak"} commits</span>
+                    <span className="text-white/70">{commitCount} commits</span>
                 </motion.div>
             </div>
         </div>

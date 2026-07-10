@@ -13,8 +13,9 @@ const dayColors: Record<string, string> = {
 };
 
 export default function MostActiveDay({ stats }: { stats: GitHubStats }) {
-    const day = stats.mostActiveDay || "Monday";
-    const colorClass = dayColors[day] || "from-purple-500 to-blue-500";
+    const dayName = stats.mostActiveDay?.name || "Monday";
+    const commitCount = stats.mostActiveDay?.commits || 0;
+    const colorClass = dayColors[dayName] || "from-purple-500 to-blue-500";
 
     return (
         <div className="w-full h-full flex flex-col justify-center items-center bg-[#050505] relative overflow-hidden">
@@ -24,7 +25,7 @@ export default function MostActiveDay({ stats }: { stats: GitHubStats }) {
                     key={d}
                     initial={{ opacity: 0, x: Math.random() * 200 - 100, y: Math.random() * 200 - 100 }}
                     animate={{
-                        opacity: d === day ? 0.3 : 0.05,
+                        opacity: d === dayName ? 0.3 : 0.05,
                         y: [0, -20, 0],
                     }}
                     transition={{
@@ -52,7 +53,7 @@ export default function MostActiveDay({ stats }: { stats: GitHubStats }) {
                     className={`inline-block px-8 py-4 rounded-2xl bg-gradient-to-r ${colorClass} mb-8`}
                 >
                     <h1 className="text-6xl md:text-7xl font-black text-white drop-shadow-lg">
-                        {day}
+                        {dayName}
                     </h1>
                 </motion.div>
 
@@ -62,7 +63,7 @@ export default function MostActiveDay({ stats }: { stats: GitHubStats }) {
                     transition={{ delay: 0.5 }}
                     className="text-xl text-white/50"
                 >
-                    {stats.mostActiveDayCommits || "Most"} commits shipped
+                    {commitCount} commits shipped
                 </motion.p>
             </div>
         </div>
