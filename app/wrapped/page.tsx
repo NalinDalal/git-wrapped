@@ -193,7 +193,11 @@ export default function WrappedPage() {
                 className="relative z-0 w-full h-full flex items-center justify-center cursor-pointer"
                 onPointerDown={handlePointerDown}
                 onPointerUp={handlePointerUp}
-                onPointerLeave={handlePointerUp}
+                onPointerLeave={() => {
+                    setIsPaused(false);
+                    const pauseDuration = Date.now() - pauseStartRef.current;
+                    pausedTimeRef.current += pauseDuration;
+                }}
             >
                 <div
                     className="absolute inset-y-0 left-0 w-[30%] opacity-0 hover:opacity-100 transition-opacity duration-500 bg-gradient-to-r from-white/5 to-transparent pointer-events-none hidden md:block"/>
