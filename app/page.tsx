@@ -99,6 +99,15 @@ export default function Home() {
                                     </Button>
                                 </div>
                             </form>
+                            {error && (
+                                <motion.p
+                                    initial={{ opacity: 0, y: 10 }}
+                                    animate={{ opacity: 1, y: 0 }}
+                                    className="text-red-400 text-sm mt-4"
+                                >
+                                    {error}
+                                </motion.p>
+                            )}
                         </motion.div>
                     ) : (
                         // STATE 2: PREVIEW & CUSTOMIZE
