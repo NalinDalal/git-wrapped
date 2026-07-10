@@ -13,5 +13,9 @@ export type WrappedSlide =
 
 export interface WrappedConfig {
     theme: "neon" | "dark" | "minimal";
+    accentColor: string;
+    font: string;
     slides: WrappedSlide[];
+    animations: "smooth" | "fast" | "none";
+    showHeatmap: boolean;
 }
