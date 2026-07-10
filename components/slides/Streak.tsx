@@ -1,7 +1,13 @@
 "use client";
 import { motion } from "motion/react";
 
-export default function Streak({ stats }: any) {
+interface StreakStats {
+    longestStreak: number;
+}
+
+
+export default function Streak({ stats }: { stats: StreakStats }) {
+
     return (
         <div className="w-full h-full flex flex-col justify-center items-center bg-black relative overflow-hidden">
 
