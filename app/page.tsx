@@ -8,6 +8,7 @@ import CustomizePanel from "@/components/CustomizePanel";
 import { useRouter } from "next/navigation";
 import type { WrappedConfig } from "@/types/wrapped";
 import type { GitHubStats } from "@/types/github";
+import { defaultWrappedConfig } from "@/wrapped.config";
 import { Github, Play, Settings2, Sparkles } from "lucide-react";
 
 export default function Home() {
@@ -167,7 +168,7 @@ export default function Home() {
                                     {!showCustomize ? (
                                         <>
                                             <Button
-                                                onClick={() => handleGenerate({ theme: "neon", slides: ["totalCommits", "commitRank", "topLanguages", "longestStreak", "summary"] })}
+                                                onClick={() => handleGenerate({ ...defaultWrappedConfig, slides: ["totalCommits", "commitRank", "topLanguages", "longestStreak", "summary"] })}
                                                 className="h-14 text-lg bg-white text-black hover:bg-gray-200 rounded-xl font-bold flex items-center gap-2 justify-center group"
                                             >
                                                 <Play className="w-5 h-5 fill-current group-hover:scale-110 transition-transform" />

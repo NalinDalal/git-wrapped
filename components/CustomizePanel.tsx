@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { useState } from "react";
 import type { WrappedConfig, WrappedSlide } from "@/types/wrapped";
+import { defaultWrappedConfig } from "@/wrapped.config";
 
 interface Props {
     onGenerate: (config: WrappedConfig) => void;
@@ -65,7 +66,7 @@ export default function CustomizePanel({ onGenerate }: Props) {
 
             <Button
                 className="w-full h-12 bg-gradient-to-r from-purple-500 to-blue-600 hover:from-purple-600 hover:to-blue-700 text-white font-bold rounded-xl"
-                onClick={() => onGenerate({ theme: "neon", slides })}
+                onClick={() => onGenerate({ ...defaultWrappedConfig, slides })}
                 disabled={slides.length === 0}
             >
                 Generate Story
