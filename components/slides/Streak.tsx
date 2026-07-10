@@ -1,5 +1,6 @@
 "use client";
 import { motion } from "motion/react";
+import { useMemo } from "react";
 
 interface StreakStats {
     longestStreak: number;
@@ -7,6 +8,11 @@ interface StreakStats {
 
 
 export default function Streak({ stats }: { stats: StreakStats }) {
+
+    const barHeights = useMemo(() =>
+        [...Array(7)].map(() => Math.random() * 40 + 20),
+        []
+    );
 
     return (
         <div className="w-full h-full flex flex-col justify-center items-center bg-black relative overflow-hidden">
@@ -46,11 +52,11 @@ export default function Streak({ stats }: { stats: StreakStats }) {
                     className="mt-12 flex gap-1 justify-center opacity-50"
                 >
                     {/* Visual calendar grid representation */}
-                    {[...Array(7)].map((_, i) => (
+                    {barHeights.map((height, i) => (
                         <motion.div
                             key={i}
                             initial={{ height: 10 }}
-                            animate={{ height: Math.random() * 40 + 20 }}
+                            animate={{ height }}
                             transition={{ duration: 0.5, delay: 0.5 + i * 0.1 }}
                             className="w-4 bg-white rounded-full"
                         />
