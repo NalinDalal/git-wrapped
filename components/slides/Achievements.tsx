@@ -33,11 +33,13 @@ export default function Achievements({ stats }: { stats: AchievementsStats }) {
                             animate={{ x: 0, opacity: 1 }}
                             transition={{ delay: index * 0.1 }}
                             className={`relative flex items-center gap-4 p-4 rounded-xl border ${badge.unlocked
-                                    ? "bg-white/5 border-white/10"
-                                    : "bg-black/40 border-white/5 opacity-50 grayscale"
+                                ? "bg-white/5 border-white/10"
+                                : "bg-black/40 border-white/5 opacity-50 grayscale"
                                 }`}
                         >
-                            <div className={`w-12 h-12 rounded-full flex items-center justify-center text-2xl ${badge.unlocked ? "bg-linear-to-br from-yellow-400/20 to-orange-500/20 border border-orange-500/30" : "bg-white/5"
+                            <div className={`w-12 h-12 rounded-full flex items-center justify-center text-2xl ${+                                badge.unlocked ? "bg-gradient-to-br from-yellow-400/20 to-orange-500/20 border border-orange-500/30" : "bg-white/5"
+                                }`}>
+
                                 }`}>
                                 {badge.icon}
                             </div>
