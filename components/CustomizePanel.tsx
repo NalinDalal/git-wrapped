@@ -6,11 +6,10 @@ import { useState } from "react";
 import type { WrappedConfig, WrappedSlide } from "@/types/wrapped";
 
 interface Props {
-    stats: any;
     onGenerate: (config: WrappedConfig) => void;
 }
 
-// FIX: Added 'persona' and 'achievements' to this list
+// All available slide types for the wrapped story
 const ALL_SLIDES: { id: WrappedSlide; label: string }[] = [
     { id: "totalCommits", label: "Total Commits" },
     { id: "commitRank", label: "Rank" },
@@ -44,11 +43,10 @@ export default function CustomizePanel({ onGenerate }: Props) {
                         <div
                             key={slide.id}
                             onClick={() => toggleSlide(slide.id)}
-                            className={`flex items-center gap-3 p-3 rounded-lg border cursor-pointer transition-all ${
-                                slides.includes(slide.id)
-                                    ? "bg-white/10 border-white/20"
-                                    : "bg-transparent border-transparent opacity-50 hover:opacity-100"
-                            }`}
+                            className={`flex items-center gap-3 p-3 rounded-lg border cursor-pointer transition-all ${slides.includes(slide.id)
+                                ? "bg-white/10 border-white/20"
+                                : "bg-transparent border-transparent opacity-50 hover:opacity-100"
+                                }`}
                         >
                             <Checkbox
                                 checked={slides.includes(slide.id)}
@@ -62,7 +60,7 @@ export default function CustomizePanel({ onGenerate }: Props) {
             </div>
 
             <Button
-                className="w-full h-12 bg-linear-to-r from-purple-500 to-blue-600 hover:from-purple-600 hover:to-blue-700 text-white font-bold rounded-xl"
+                className="w-full h-12 bg-gradient-to-r from-purple-500 to-blue-600 hover:from-purple-600 hover:to-blue-700 text-white font-bold rounded-xl"
                 onClick={() => onGenerate({ theme: "neon", slides })}
                 disabled={slides.length === 0}
             >
