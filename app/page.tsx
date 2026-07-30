@@ -126,7 +126,7 @@ export default function Home() {
                                     {/* Decorative Noise/Grain could go here */}
 
                                     <div className="space-y-1">
-                                        <p className="text-sm font-medium text-white/50 uppercase tracking-widest">2025 Wrapped</p>
+                                        <p className="text-sm font-medium text-white/50 uppercase tracking-widest">{new Date().getFullYear()} Wrapped</p>
                                         <h2 className="text-3xl font-bold">@{username}</h2>
                                     </div>
 
@@ -191,9 +191,9 @@ export default function Home() {
                                         >
                                             <div className="flex justify-between items-center mb-4">
                                                 <h3 className="font-semibold">Story Settings</h3>
-                                                <button onClick={() => setShowCustomize(false)} className="text-xs text-white/50 hover:text-white">Close</button>
+                                                <button onClick={() => setShowCustomize(false)} className="text-xs text-white/50 hover:text-white" aria-label="Close settings">Close</button>
                                             </div>
-                                            <CustomizePanel stats={stats} onGenerate={handleGenerate} />
+                                            <CustomizePanel onGenerate={handleGenerate} />
                                         </motion.div>
                                     )}
                                 </div>

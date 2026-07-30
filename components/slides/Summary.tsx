@@ -6,9 +6,9 @@ import type { GitHubStats } from "@/types/github";
 export default function Summary({ stats }: { stats: GitHubStats }) {
     const [mode, setMode] = useState<"card" | "receipt">("card");
     const barcodeBars = useMemo(() =>
-        Array.from({ length: 20 }, () => ({
-            width: Math.random() > 0.5 ? 4 : 2,
-            opacity: Math.random() > 0.3 ? 1 : 0.5,
+        Array.from({ length: 20 }, (_, i) => ({
+            width: i % 3 === 0 ? 4 : 2,
+            opacity: i % 4 === 0 ? 0.5 : 1,
         })),
     []);
 
@@ -19,12 +19,14 @@ export default function Summary({ stats }: { stats: GitHubStats }) {
             <div className="absolute top-20 right-6 z-20 flex bg-white/10 rounded-full p-1 backdrop-blur-md">
                 <button
                     onClick={() => setMode("card")}
+                    aria-pressed={mode === "card"}
                     className={`px-4 py-1.5 rounded-full text-xs font-bold transition-all ${mode === "card" ? "bg-white text-black" : "text-white/50"}`}
                 >
                     Card
                 </button>
                 <button
                     onClick={() => setMode("receipt")}
+                    aria-pressed={mode === "receipt"}
                     className={`px-4 py-1.5 rounded-full text-xs font-bold transition-all ${mode === "receipt" ? "bg-white text-black" : "text-white/50"}`}
                 >
                     Receipt

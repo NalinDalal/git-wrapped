@@ -4,7 +4,7 @@ import type { GitHubStats } from "@/types/github";
 
 export type PersonaType = "The Machine" | "The Architect" | "The Fixer" | "The Artist" | "The Ghost";
 
-interface Badge {
+export interface Badge {
     id: string;
     icon: string;
     title: string;
@@ -41,7 +41,7 @@ export function calculatePersona(stats: GitHubStats) {
         quote = "Rarely seen, but your impact is felt.";
     }
 
-    return { class: characterClass, quote, power };
+    return { characterClass, quote, power };
 }
 
 export function calculateBadges(stats: GitHubStats): Badge[] {

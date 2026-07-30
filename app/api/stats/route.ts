@@ -1,26 +1,24 @@
 import { NextResponse } from "next/server";
 import { Octokit } from "@octokit/rest";
-import type { GitHubStats, ContributionDay } from "@/types/github";
+import type { GitHubStats, ContributionDay, GraphQLResponse } from "@/types/github";
 
-interface GraphQLResponse {
-  user: {
-    contributionsCollection: {
-      contributionCalendar: {
-        totalContributions: number;
-        weeks: Array<{
-          contributionDays: ContributionDay[];
-        }>;
-      };
-    };
-    repositories: {
-      nodes: Array<{
-        stargazerCount: number;
-        primaryLanguage: {
-          name: string;
-        } | null;
-      }>;
-    };
-  };
+const rateLimitMap = new Map<string, { count: number; resetTime: number }>();
+const RATE_LIMIT_WINDOW = 60_000;
+const RATE_LIMIT_MAX = 10;
+
+function checkRateLimit(ip: string): boolean {
+  const now = Date.now();
+  const record = rateLimitMap.get(ip);
+
+  if (!record || now > record.resetTime) {
+    rateLimitMap.set(ip, { count: 1, resetTime: now + RATE_LIMIT_WINDOW });
+    return true;
+  }
+
+  if (record.count >= RATE_LIMIT_MAX) return false;
+
+  record.count++;
+  return true;
 }
 
 /**
@@ -76,6 +74,16 @@ const MONTH_NAMES = [
  */
 export async function GET(request: Request): Promise<NextResponse> {
   try {
+    const forwarded = request.headers.get("x-forwarded-for");
+    const ip = forwarded?.split(",")[0] || "unknown";
+
+    if (!checkRateLimit(ip)) {
+      return NextResponse.json(
+        { error: "Too many requests. Please try again later." },
+        { status: 429 },
+      );
+    }
+
     const GITHUB_TOKEN = process.env.GITHUB_TOKEN;
     if (!GITHUB_TOKEN) {
       return NextResponse.json(
@@ -86,11 +94,10 @@ export async function GET(request: Request): Promise<NextResponse> {
 
     const octokit = new Octokit({ auth: GITHUB_TOKEN });
 
-    // Extract username from query parameters
     const { searchParams } = new URL(request.url);
     const username = searchParams.get("username");
 
-    if (!username) {
+    if (!username || !/^[a-zA-Z0-9]([a-zA-Z0-9-]*[a-zA-Z0-9])?$/.test(username) || username.length > 39) {
       return NextResponse.json(
         { error: "Username parameter is required" },
         { status: 400 },
@@ -132,7 +139,7 @@ export async function GET(request: Request): Promise<NextResponse> {
     const contributionDays =
       userData.contributionsCollection.contributionCalendar.weeks
         .flatMap((week) => week.contributionDays)
-        .filter((day) => new Date(day.date) >= new Date("2024-01-01"));
+        .filter((day) => new Date(day.date) >= new Date(`${new Date().getFullYear()}-01-01`));
 
     // Calculate monthly contribution statistics
     const monthlyCommits: Record<string, number> = {};
@@ -182,6 +189,12 @@ export async function GET(request: Request): Promise<NextResponse> {
       .slice(0, 3)
       .map(([lang]) => lang);
 
+    const topLanguagesCount = Object.fromEntries(
+      Object.entries(languages)
+        .sort(([, a], [, b]) => b - a)
+        .slice(0, 3)
+    );
+
     // Calculate contribution streaks
     let currentStreak = 0;
     let maxStreak = 0;
@@ -219,14 +232,14 @@ export async function GET(request: Request): Promise<NextResponse> {
         : { name: "N/A", commits: 0 },
       starsEarned: totalStars,
       topLanguages,
+      topLanguagesCount,
     };
 
     return NextResponse.json(stats);
   } catch (error: unknown) {
     console.error("Error fetching GitHub stats:", error);
-    const errorMessage = error instanceof Error ? error.message : "Failed to fetch GitHub statistics";
     return NextResponse.json(
-      { error: errorMessage },
+      { error: "Failed to fetch GitHub statistics" },
       { status: 500 },
     );
   }

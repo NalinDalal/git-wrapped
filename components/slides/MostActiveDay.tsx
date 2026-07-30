@@ -1,5 +1,6 @@
 "use client";
 import { motion } from "motion/react";
+import { useMemo } from "react";
 import type { GitHubStats } from "@/types/github";
 
 const dayColors: Record<string, string> = {
@@ -17,15 +18,23 @@ export default function MostActiveDay({ stats }: { stats: GitHubStats }) {
     const commitCount = stats.mostActiveDay?.commits || 0;
     const colorClass = dayColors[dayName] || "from-purple-500 to-blue-500";
 
+    const dayIndicators = useMemo(() =>
+        Object.keys(dayColors).map((d, i) => ({
+            name: d,
+            x: (((i * 137.508) % 200) - 100),
+            y: (((i * 97.3) % 200) - 100),
+        })),
+    []);
+
     return (
         <div className="w-full h-full flex flex-col justify-center items-center bg-[#050505] relative overflow-hidden">
             {/* Floating day indicators */}
-            {Object.keys(dayColors).map((d, i) => (
+            {dayIndicators.map((d, i) => (
                 <motion.div
-                    key={d}
-                    initial={{ opacity: 0, x: Math.random() * 200 - 100, y: Math.random() * 200 - 100 }}
+                    key={d.name}
+                    initial={{ opacity: 0, x: d.x, y: d.y }}
                     animate={{
-                        opacity: d === dayName ? 0.3 : 0.05,
+                        opacity: d.name === dayName ? 0.3 : 0.05,
                         y: [0, -20, 0],
                     }}
                     transition={{
@@ -33,7 +42,7 @@ export default function MostActiveDay({ stats }: { stats: GitHubStats }) {
                         repeat: Infinity,
                         delay: i * 0.2,
                     }}
-                    className={`absolute w-24 h-24 rounded-full bg-gradient-to-br ${dayColors[d]} blur-2xl`}
+                    className={`absolute w-24 h-24 rounded-full bg-gradient-to-br ${dayColors[d.name]} blur-2xl`}
                 />
             ))}
 

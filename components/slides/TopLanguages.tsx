@@ -9,6 +9,8 @@ const languagesColors: Record<string, string> = {
 
 export default function TopLanguages({ stats }: { stats: GitHubStats }) {
     const languages = stats.topLanguages || [];
+    const counts = stats.topLanguagesCount || {};
+    const maxCount = Math.max(...Object.values(counts), 1);
 
     return (
         <div className="w-full h-full flex flex-col justify-center p-8 bg-[#0D1117] relative font-mono">
@@ -28,7 +30,7 @@ export default function TopLanguages({ stats }: { stats: GitHubStats }) {
                         animate={{ opacity: 1, x: 0 }}
                         className="text-green-400 text-sm mb-2"
                     >
-                        // Your stack defined you
+                        {"{/* Your stack defined you */}"}
                     </motion.p>
                     <h2 className="text-4xl font-bold text-white">
                         const <span className="text-blue-400">stack</span> = [
@@ -39,13 +41,13 @@ export default function TopLanguages({ stats }: { stats: GitHubStats }) {
                     {languages.map((lang: string, index: number) => (
                         <div key={lang} className="relative">
                             <div className="flex items-center gap-4 mb-2">
-                                <span className="text-zinc-600">"{lang}"</span>,
+                                <span className="text-zinc-600">{`"${lang}"`}</span>,
                             </div>
                             {/* Animated Bar */}
                             <div className="h-12 w-full bg-white/5 rounded-lg overflow-hidden relative group border border-white/5 hover:border-white/20 transition-colors">
                                 <motion.div
                                     initial={{ width: 0 }}
-                                    animate={{ width: `${100 - (index * 25)}%` }} // Mock percentage
+                                    animate={{ width: `${((counts[lang] || 1) / maxCount) * 100}%` }}
                                     transition={{ delay: 0.5 + (index * 0.2), duration: 1, ease: "circOut" }}
                                     className="h-full absolute top-0 left-0 opacity-80"
                                     style={{ backgroundColor: languagesColors[lang] || languagesColors.default }}

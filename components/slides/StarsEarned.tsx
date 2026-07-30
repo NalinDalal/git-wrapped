@@ -1,42 +1,42 @@
 "use client";
-import { motion, useSpring, useTransform } from "motion/react";
-import { useEffect } from "react";
+import { motion } from "motion/react";
+import { useMemo } from "react";
 import { Star } from "lucide-react";
+import { Counter } from "@/components/ui/counter";
 import type { GitHubStats } from "@/types/github";
-
-function Counter({ value }: { value: number }) {
-    const spring = useSpring(0, { mass: 0.8, stiffness: 75, damping: 15 });
-    const display = useTransform(spring, (current) => Math.round(current).toLocaleString());
-
-    useEffect(() => {
-        spring.set(value);
-    }, [value, spring]);
-
-    return <motion.span>{display}</motion.span>;
-}
 
 export default function StarsEarned({ stats }: { stats: GitHubStats }) {
     const stars = stats.starsEarned || 0;
 
+    const floatingStars = useMemo(() =>
+        Array.from({ length: 20 }, (_, i) => ({
+            id: i,
+            x: (((i * 137.508) % 800) - 400),
+            y: (((i * 97.3) % 600) - 300),
+            duration: 3 + (i % 5) * 0.5,
+            delay: (i % 7) * 0.5,
+        })),
+    []);
+
     return (
         <div className="w-full h-full flex flex-col justify-center items-center bg-[#0a0a0a] relative overflow-hidden">
             {/* Floating stars background */}
-            {[...Array(20)].map((_, i) => (
+            {floatingStars.map((star) => (
                 <motion.div
-                    key={i}
+                    key={star.id}
                     initial={{
                         opacity: 0,
-                        x: Math.random() * 800 - 400,
-                        y: Math.random() * 600 - 300,
+                        x: star.x,
+                        y: star.y,
                     }}
                     animate={{
                         opacity: [0, 0.3, 0],
                         y: [0, -50],
                     }}
                     transition={{
-                        duration: 3 + Math.random() * 2,
+                        duration: star.duration,
                         repeat: Infinity,
-                        delay: Math.random() * 3,
+                        delay: star.delay,
                     }}
                     className="absolute"
                 >

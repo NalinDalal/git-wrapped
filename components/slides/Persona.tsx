@@ -1,18 +1,11 @@
 "use client";
 import { motion } from "motion/react";
 import { calculatePersona } from "@/lib/gamification";
+import { ensureChartRegistered } from "@/lib/chartSetup";
 import { Radar } from "react-chartjs-2";
-import {
-    Chart as ChartJS,
-    RadialLinearScale,
-    PointElement,
-    LineElement,
-    Filler,
-    Tooltip,
-} from "chart.js";
 import type { GitHubStats } from "@/types/github";
 
-ChartJS.register(RadialLinearScale, PointElement, LineElement, Filler, Tooltip);
+ensureChartRegistered();
 
 export default function Persona({ stats }: { stats: GitHubStats }) {
     const persona = calculatePersona(stats);
@@ -52,7 +45,7 @@ export default function Persona({ stats }: { stats: GitHubStats }) {
     return (
         <div className="w-full h-full flex flex-col items-center justify-center p-6 bg-black relative overflow-hidden">
             {/* Glitchy Background */}
-            <div className="absolute inset-0 bg-[url('https://media.giphy.com/media/xT9IgN8YK5MBoz82ws/giphy.gif')] opacity-5 mix-blend-screen pointer-events-none" />
+            <div className="absolute inset-0 bg-[repeating-linear-gradient(0deg,transparent,transparent_2px,rgba(255,255,255,0.02)_2px,rgba(255,255,255,0.02)_4px)] opacity-5 mix-blend-screen pointer-events-none" />
 
             <motion.div
                 initial={{ opacity: 0, scale: 0.9 }}
@@ -74,7 +67,7 @@ export default function Persona({ stats }: { stats: GitHubStats }) {
                             transition={{ delay: 0.2 }}
                             className="text-4xl font-black text-white italic"
                         >
-                            {persona.class.toUpperCase()}
+                            {persona.characterClass.toUpperCase()}
                         </motion.h1>
                     </div>
                     <div className="w-12 h-12 bg-white/5 rounded-full flex items-center justify-center border border-white/10">

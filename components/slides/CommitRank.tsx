@@ -69,7 +69,7 @@ export default function CommitRank({ stats }: { stats: GitHubStats }) {
                                     initial={{ width: 0 }}
                                     animate={{ width: "100%" }}
                                     transition={{ delay: 0.5, duration: 1.5, ease: "easeOut" }}
-                                    className={`h-full bg-linear-to-r ${isElite ? "from-yellow-400 to-amber-600" : "from-blue-400 to-purple-600"}`}
+                                    className={`h-full bg-gradient-to-r ${isElite ? "from-yellow-400 to-amber-600" : "from-blue-400 to-purple-600"}`}
                                 />
                             </div>
                             <p className="text-center text-sm text-zinc-500">

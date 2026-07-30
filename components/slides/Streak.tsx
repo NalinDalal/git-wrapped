@@ -7,7 +7,7 @@ import type { GitHubStats } from "@/types/github";
 export default function Streak({ stats }: { stats: GitHubStats }) {
 
     const barHeights = useMemo(() =>
-        [...Array(7)].map(() => Math.random() * 40 + 20),
+        [35, 55, 28, 48, 32, 52, 42],
         []
     );
 

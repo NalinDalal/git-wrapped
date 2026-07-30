@@ -4,6 +4,27 @@ export interface ContributionDay {
   weekday: number;
 }
 
+export interface GraphQLResponse {
+  user: {
+    contributionsCollection: {
+      contributionCalendar: {
+        totalContributions: number;
+        weeks: Array<{
+          contributionDays: ContributionDay[];
+        }>;
+      };
+    };
+    repositories: {
+      nodes: Array<{
+        stargazerCount: number;
+        primaryLanguage: {
+          name: string;
+        } | null;
+      }>;
+    };
+  };
+}
+
 export interface GitHubStats {
   longestStreak: number;
   totalCommits: number;
@@ -19,5 +40,6 @@ export interface GitHubStats {
   };
   starsEarned: number;
   topLanguages: string[];
+  topLanguagesCount: Record<string, number>;
   username?: string;
 }

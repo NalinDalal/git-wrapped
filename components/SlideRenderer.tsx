@@ -45,6 +45,10 @@ export default function SlideRenderer({ slide, stats, onNext }: SlideRendererPro
         case "achievements":
             return <Achievements {...common} />;
         default:
-            return null;
+            return (
+                <div className="w-full h-full flex items-center justify-center bg-black text-white/50">
+                    <p>Unknown slide type</p>
+                </div>
+            );
     }
 }

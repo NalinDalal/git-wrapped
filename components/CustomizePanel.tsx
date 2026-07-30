@@ -48,6 +48,10 @@ export default function CustomizePanel({ onGenerate }: Props) {
                         <div
                             key={slide.id}
                             onClick={() => toggleSlide(slide.id)}
+                            onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") toggleSlide(slide.id); }}
+                            role="checkbox"
+                            aria-checked={slides.includes(slide.id)}
+                            tabIndex={0}
                             className={`flex items-center gap-3 p-3 rounded-lg border cursor-pointer transition-all ${slides.includes(slide.id)
                                 ? "bg-white/10 border-white/20"
                                 : "bg-transparent border-transparent opacity-50 hover:opacity-100"

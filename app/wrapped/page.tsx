@@ -23,7 +23,7 @@ export default function WrappedPage() {
 
     const pointerStartRef = useRef({x: 0, y: 0});
 
-    const fetchStats = async () => {
+    useEffect(() => {
         const stats = sessionStorage.getItem("wrappedStats");
         const config = sessionStorage.getItem("wrappedConfig");
 
@@ -32,21 +32,16 @@ export default function WrappedPage() {
             return;
         }
         try {
-            setData({
+            const parsed = {
                 stats: JSON.parse(stats),
                 config: JSON.parse(config),
-            });
+            };
+            // Use queueMicrotask to defer state update
+            queueMicrotask(() => setData(parsed));
         } catch (e) {
             console.error(e);
             router.push("/");
         }
-    }
-
-    useEffect(() => {
-        (async () => {
-            await fetchStats();
-        })()
-
     }, [router]);
 
     // --- Navigation Logic ---
@@ -134,10 +129,18 @@ export default function WrappedPage() {
         const handleKeyDown = (e: KeyboardEvent) => {
             if (e.key === "ArrowRight") goToNext();
             if (e.key === "ArrowLeft") goToPrev();
-            if (e.key === " ") setIsPaused(true);
+            if (e.key === " ") {
+                e.preventDefault();
+                setIsPaused(true);
+                pauseStartRef.current = Date.now();
+            }
         };
         const handleKeyUp = (e: KeyboardEvent) => {
-            if (e.key === " ") setIsPaused(false);
+            if (e.key === " ") {
+                setIsPaused(false);
+                const pauseDuration = Date.now() - pauseStartRef.current;
+                pausedTimeRef.current += pauseDuration;
+            }
         };
         window.addEventListener("keydown", handleKeyDown);
         window.addEventListener("keyup", handleKeyUp);
@@ -152,11 +155,10 @@ export default function WrappedPage() {
     return (
         <main
             className="fixed inset-0 bg-black overflow-hidden font-sans select-none touch-none"
-            onContextMenu={(e) => e.preventDefault()}
         >
 
             <div className="absolute top-0 left-0 right-0 z-50 p-4 pt-6 flex gap-2 pointer-events-none">
-                {data.config.slides.map((slide: string, index: number) => (
+                {data.config.slides.map((slide, index) => (
                     <div key={index} className="h-1 flex-1 bg-white/20 rounded-full overflow-hidden backdrop-blur-sm">
                         <div
                             ref={index === currentSlideIndex ? progressRef : null}
@@ -183,6 +185,7 @@ export default function WrappedPage() {
                         router.push("/");
                     }}
                     className="p-2 text-white/50 hover:text-white hover:bg-white/10 rounded-full transition-colors cursor-pointer pointer-events-auto"
+                    aria-label="Close wrapped view"
                 >
                     <X className="w-6 h-6"/>
                 </button>
@@ -210,10 +213,11 @@ export default function WrappedPage() {
                         exit={{opacity: 0, scale: 1.05, filter: "blur(10px)"}}
                         transition={{duration: 0.4, ease: [0.22, 1, 0.36, 1]}}
                     >
-                        <SlideRenderer
-                            slide={data.config.slides[currentSlideIndex]}
-                            stats={data.stats}
-                        />
+<SlideRenderer
+                                slide={data.config.slides[currentSlideIndex]}
+                                stats={data.stats}
+                                onNext={goToNext}
+                            />
                     </motion.div>
                 </AnimatePresence>
             </div>
