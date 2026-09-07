@@ -9,7 +9,8 @@ export type WrappedSlide =
     | "starsEarned"
     | "summary"
     | "persona"
-    | "achievements";
+    | "achievements"
+    | "heatmap";
 
 export interface WrappedConfig {
     theme: "neon" | "dark" | "minimal";

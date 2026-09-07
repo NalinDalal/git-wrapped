@@ -20,7 +20,7 @@ export default function MostActiveMonth({ stats }: { stats: GitHubStats }) {
                     rotate: [0, 360],
                 }}
                 transition={{ duration: 60, repeat: Infinity, ease: "linear" }}
-                className="absolute w-[600px] h-[600px] bg-gradient-to-br from-purple-600/20 to-blue-600/20 rounded-full blur-[80px]"
+                className="absolute w-[600px] h-[600px] bg-white/[0.03] rounded-full blur-[80px]"
             />
 
             <div className="relative z-10 text-center">

@@ -11,6 +11,7 @@ export const defaultWrappedConfig: WrappedConfig = {
         "mostActiveDay",
         "mostActiveMonth",
         "longestStreak",
+        "heatmap",
         "starsEarned",
         "summary",
     ],

@@ -45,14 +45,9 @@ export default function Home() {
     };
 
     return (
-        <main className="min-h-screen bg-[#050505] text-white overflow-hidden relative selection:bg-purple-500/30">
-            {/* Ambient Background */}
-            <div className="absolute inset-0 pointer-events-none">
-                <div className="absolute top-[-20%] left-[-10%] w-[50vw] h-[50vw] bg-purple-900/20 rounded-full blur-[120px] animate-pulse" />
-                <div className="absolute bottom-[-20%] right-[-10%] w-[50vw] h-[50vw] bg-blue-900/10 rounded-full blur-[120px]" />
-            </div>
+        <main className="min-h-screen bg-[#050505] text-white relative selection:bg-white/20">
 
-            <div className="relative z-10 container mx-auto px-4 h-screen flex flex-col items-center justify-center">
+            <div className="relative z-10 container mx-auto px-4 min-h-screen flex flex-col items-center justify-center py-12">
                 <AnimatePresence mode="wait">
                     {!stats ? (
                         // STATE 1: INPUT
@@ -80,8 +75,7 @@ export default function Home() {
                             </div>
 
                             <form onSubmit={handleFetch} className="relative group">
-                                <div className="absolute -inset-1 bg-gradient-to-r from-purple-600 to-blue-600 rounded-xl blur opacity-25 group-hover:opacity-50 transition duration-500" />
-                                <div className="relative flex gap-2 bg-[#0A0A0A] p-2 rounded-xl border border-white/10">
+                                <div className="relative flex gap-2 bg-[#0A0A0A] p-2 rounded-xl border border-white/10 group-hover:border-white/20 transition-colors">
                                     <Input
                                         placeholder="github_username"
                                         value={username}
@@ -121,7 +115,6 @@ export default function Home() {
                         >
                             {/* Left: The "Cover" Card */}
                             <div className="order-2 md:order-1 relative aspect-[4/5] md:aspect-square max-h-[600px] w-full">
-                                <div className="absolute inset-0 bg-gradient-to-br from-purple-500/10 to-blue-500/10 rounded-[2rem] blur-xl" />
                                 <div className="relative h-full bg-[#0A0A0A]/90 backdrop-blur-xl border border-white/10 rounded-[2rem] p-8 flex flex-col justify-between overflow-hidden group">
                                     {/* Decorative Noise/Grain could go here */}
 
@@ -142,14 +135,15 @@ export default function Home() {
                                                 initial={{ width: 0 }}
                                                 animate={{ width: "100%" }}
                                                 transition={{ duration: 1.5, ease: "easeOut" }}
-                                                className="h-full bg-gradient-to-r from-purple-500 to-blue-500"
+                                                className="h-full bg-white"
                                             />
                                         </div>
                                     </div>
 
                                     <div className="flex justify-between items-end">
-                                        <div className="bg-white/5 px-4 py-2 rounded-full border border-white/10">
-                                            <span className="text-sm font-medium">{stats.commitRank}</span>
+                                        <div className="bg-white/5 px-4 py-2 rounded-full border border-white/10 flex items-center gap-2">
+                                            <span>{stats.rankIcon}</span>
+                                            <span className="text-sm font-medium">{stats.rankTitle}</span>
                                         </div>
                                         <Sparkles className="w-8 h-8 text-yellow-400 opacity-50 group-hover:opacity-100 transition-opacity" />
                                     </div>
@@ -157,7 +151,7 @@ export default function Home() {
                             </div>
 
                             {/* Right: Controls */}
-                            <div className="order-1 md:order-2 space-y-8">
+                            <div className="order-1 md:order-2 space-y-8 md:max-h-[80vh] md:overflow-y-auto md:pr-2">
                                 <div className="space-y-2">
                                     <h2 className="text-3xl font-bold">Your Year in Code</h2>
                                     <p className="text-white/50">Ready to watch your story?</p>
@@ -177,7 +171,7 @@ export default function Home() {
                                             <Button
                                                 variant="outline"
                                                 onClick={() => setShowCustomize(true)}
-                                                className="h-14 text-lg border-white/10 hover:bg-white/5 hover:text-white rounded-xl flex items-center gap-2 justify-center"
+                                                className="h-14 text-lg bg-transparent text-white border-white/10 hover:bg-white/10 hover:text-white rounded-xl flex items-center gap-2 justify-center"
                                             >
                                                 <Settings2 className="w-5 h-5" />
                                                 Customize

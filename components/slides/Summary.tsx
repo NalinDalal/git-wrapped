@@ -16,9 +16,10 @@ export default function Summary({ stats }: { stats: GitHubStats }) {
         <div className="w-full h-full flex flex-col items-center justify-center bg-[#050505] p-6 relative">
 
             {/* Mode Toggle */}
-            <div className="absolute top-20 right-6 z-20 flex bg-white/10 rounded-full p-1 backdrop-blur-md">
+            <div className="absolute top-16 right-6 z-[60] flex bg-white/10 rounded-full p-1 backdrop-blur-md">
                 <button
                     onClick={() => setMode("card")}
+                    onPointerDown={(e) => e.stopPropagation()}
                     aria-pressed={mode === "card"}
                     className={`px-4 py-1.5 rounded-full text-xs font-bold transition-all ${mode === "card" ? "bg-white text-black" : "text-white/50"}`}
                 >
@@ -26,6 +27,7 @@ export default function Summary({ stats }: { stats: GitHubStats }) {
                 </button>
                 <button
                     onClick={() => setMode("receipt")}
+                    onPointerDown={(e) => e.stopPropagation()}
                     aria-pressed={mode === "receipt"}
                     className={`px-4 py-1.5 rounded-full text-xs font-bold transition-all ${mode === "receipt" ? "bg-white text-black" : "text-white/50"}`}
                 >

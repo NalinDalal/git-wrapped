@@ -22,6 +22,7 @@ const ALL_SLIDES: { id: WrappedSlide; label: string }[] = [
     { id: "starsEarned", label: "Stars Earned" },
     { id: "persona", label: "Persona Identity" },
     { id: "achievements", label: "Achievements" },
+    { id: "heatmap", label: "Contribution Heatmap" },
     { id: "summary", label: "Summary Card" },
 ];
 
@@ -69,7 +70,7 @@ export default function CustomizePanel({ onGenerate }: Props) {
             </div>
 
             <Button
-                className="w-full h-12 bg-gradient-to-r from-purple-500 to-blue-600 hover:from-purple-600 hover:to-blue-700 text-white font-bold rounded-xl"
+                className="w-full h-12 bg-white text-black hover:bg-gray-200 font-bold rounded-xl"
                 onClick={() => onGenerate({ ...defaultWrappedConfig, slides })}
                 disabled={slides.length === 0}
             >

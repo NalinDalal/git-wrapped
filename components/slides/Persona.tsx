@@ -11,7 +11,7 @@ export default function Persona({ stats }: { stats: GitHubStats }) {
     const persona = calculatePersona(stats);
 
     const data = {
-        labels: ["STR", "AGI", "END", "WIS"],
+        labels: ["Commits", "Languages", "Streak", "Stars"],
         datasets: [
             {
                 label: "Power Stats",
@@ -89,10 +89,10 @@ export default function Persona({ stats }: { stats: GitHubStats }) {
                     <p className="text-zinc-400 text-sm italic">&#34;{persona.quote}&#34;</p>
 
                     <div className="grid grid-cols-2 gap-2 text-xs font-mono text-zinc-500 mt-4 border-t border-white/10 pt-4">
-                        <div className="bg-black/40 p-2 rounded">STR: {persona.power.strength}</div>
-                        <div className="bg-black/40 p-2 rounded">AGI: {persona.power.agility}</div>
-                        <div className="bg-black/40 p-2 rounded">END: {persona.power.endurance}</div>
-                        <div className="bg-black/40 p-2 rounded">WIS: {persona.power.wisdom}</div>
+                        <div className="bg-black/40 p-2 rounded">Commits: {persona.power.strength}</div>
+                        <div className="bg-black/40 p-2 rounded">Languages: {persona.power.agility}</div>
+                        <div className="bg-black/40 p-2 rounded">Streak: {persona.power.endurance}</div>
+                        <div className="bg-black/40 p-2 rounded">Stars: {persona.power.wisdom}</div>
                     </div>
                 </motion.div>
             </motion.div>

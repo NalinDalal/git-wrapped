@@ -25,14 +25,14 @@ function checkRateLimit(ip: string): boolean {
  * Determines the user's commit rank based on their total number of contributions
  * These thresholds are approximations based on general GitHub activity patterns
  */
-function getCommitRank(totalCommits: number): string {
-  if (totalCommits >= 5000) return "Top 0.5%-1%";
-  if (totalCommits >= 2000) return "Top 1%-3%";
-  if (totalCommits >= 1000) return "Top 5%-10%";
-  if (totalCommits >= 500) return "Top 10%-15%";
-  if (totalCommits >= 200) return "Top 25%-30%";
-  if (totalCommits >= 50) return "Median 50%";
-  return "Bottom 30%";
+function getCommitRank(totalCommits: number): { percentile: string; title: string; icon: string } {
+  if (totalCommits >= 5000) return { percentile: "Top 0.5%-1%", title: "The Legend", icon: "👑" };
+  if (totalCommits >= 2000) return { percentile: "Top 1%-3%", title: "The Elite", icon: "🔥" };
+  if (totalCommits >= 1000) return { percentile: "Top 5%-10%", title: "The Specialist", icon: "🎯" };
+  if (totalCommits >= 500) return { percentile: "Top 10%-15%", title: "The Workhorse", icon: "💪" };
+  if (totalCommits >= 200) return { percentile: "Top 25%-30%", title: "The Regular", icon: "⚡" };
+  if (totalCommits >= 50) return { percentile: "Median 50%", title: "The Contributor", icon: "🔧" };
+  return { percentile: "Bottom 30%", title: "The Observer", icon: "👀" };
 }
 
 // Constants for date formatting
@@ -213,10 +213,13 @@ export async function GET(request: Request): Promise<NextResponse> {
     const sortedWeeks = contributionDays.length / 7 || 1;
 
     // Prepare and return the final statistics
+    const rank = getCommitRank(totalCommits);
     const stats: GitHubStats = {
       longestStreak: maxStreak,
       totalCommits,
-      commitRank: getCommitRank(totalCommits),
+      commitRank: rank.percentile,
+      rankTitle: rank.title,
+      rankIcon: rank.icon,
       calendarData: contributionDays,
       mostActiveDay: sortedDays.length > 0
         ? {

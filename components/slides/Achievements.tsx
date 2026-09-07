@@ -5,18 +5,22 @@ import type { GitHubStats } from "@/types/github";
 
 export default function Achievements({ stats }: { stats: GitHubStats }) {
     const badges = calculateBadges(stats);
+    const unlockedCount = badges.filter(b => b.unlocked).length;
 
     return (
         <div className="w-full h-full flex flex-col justify-center p-8 bg-[#09090b] relative">
             <div className="max-w-md mx-auto w-full">
-                <motion.h2
+                <motion.div
                     initial={{ opacity: 0, y: -20 }}
                     animate={{ opacity: 1, y: 0 }}
-                    className="text-2xl font-bold text-white mb-2"
+                    className="mb-8"
                 >
-                    Achievements
-                </motion.h2>
-                <p className="text-zinc-500 text-sm mb-8">Badges unlocked this year</p>
+                    <p className="text-xs font-bold text-white/30 uppercase tracking-widest mb-2">Unlocked</p>
+                    <div className="flex items-baseline gap-3">
+                        <h2 className="text-5xl font-black text-white">{unlockedCount}</h2>
+                        <span className="text-lg text-white/30">/ {badges.length}</span>
+                    </div>
+                </motion.div>
 
                 <div className="grid gap-3">
                     {badges.map((badge, index) => (

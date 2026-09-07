@@ -159,10 +159,10 @@ export default function WrappedPage() {
 
             <div className="absolute top-0 left-0 right-0 z-50 p-4 pt-6 flex gap-2 pointer-events-none">
                 {data.config.slides.map((slide, index) => (
-                    <div key={index} className="h-1 flex-1 bg-white/20 rounded-full overflow-hidden backdrop-blur-sm">
+                    <div key={index} className="h-1 flex-1 bg-white/10 rounded-full overflow-hidden">
                         <div
                             ref={index === currentSlideIndex ? progressRef : null}
-                            className="h-full bg-white shadow-[0_0_10px_rgba(255,255,255,0.5)]"
+                            className="h-full bg-white"
                             style={{
                                 width: index < currentSlideIndex ? "100%" : "0%",
                                 transition: index !== currentSlideIndex ? "width 0.3s ease" : "none"
@@ -201,9 +201,6 @@ export default function WrappedPage() {
                     pausedTimeRef.current += pauseDuration;
                 }}
             >
-                <div
-                    className="absolute inset-y-0 left-0 w-[30%] opacity-0 hover:opacity-100 transition-opacity duration-500 bg-gradient-to-r from-white/5 to-transparent pointer-events-none hidden md:block"/>
-
                 <AnimatePresence mode="wait">
                     <motion.div
                         key={currentSlideIndex}
@@ -213,11 +210,11 @@ export default function WrappedPage() {
                         exit={{opacity: 0, scale: 1.05, filter: "blur(10px)"}}
                         transition={{duration: 0.4, ease: [0.22, 1, 0.36, 1]}}
                     >
-<SlideRenderer
-                                slide={data.config.slides[currentSlideIndex]}
-                                stats={data.stats}
-                                onNext={goToNext}
-                            />
+                        <SlideRenderer
+                            slide={data.config.slides[currentSlideIndex]}
+                            stats={data.stats}
+                            onNext={goToNext}
+                        />
                     </motion.div>
                 </AnimatePresence>
             </div>

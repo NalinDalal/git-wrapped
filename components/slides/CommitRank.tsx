@@ -32,9 +32,8 @@ export default function CommitRank({ stats }: { stats: GitHubStats }) {
             onMouseMove={handleMouseMove}
             onMouseLeave={() => { x.set(0); y.set(0); }}
         >
-            {/* Background Gradients */}
-            <div className="absolute top-[-20%] left-[-20%] w-[80vw] h-[80vw] bg-purple-900/30 rounded-full blur-[120px]" />
-            <div className="absolute bottom-[-20%] right-[-20%] w-[80vw] h-[80vw] bg-blue-900/20 rounded-full blur-[120px]" />
+            {/* Background */}
+            <div className="absolute top-[-20%] left-[-20%] w-[80vw] h-[80vw] bg-white/[0.02] rounded-full blur-[120px]" />
 
             <motion.div
                 style={{ rotateX, rotateY, transformStyle: "preserve-3d" }}
@@ -48,7 +47,7 @@ export default function CommitRank({ stats }: { stats: GitHubStats }) {
                     <div className="h-full flex flex-col justify-between p-10 relative z-10">
                         <div className="flex justify-between items-start">
                             <div className="w-12 h-12 rounded-full border border-white/20 flex items-center justify-center text-2xl bg-white/5">
-                                {isElite ? "🏆" : "🎖️"}
+                                {stats.rankIcon || (isElite ? "🏆" : "🎖️")}
                             </div>
                             <div className="text-right">
                                 <p className="text-xs uppercase tracking-widest text-zinc-500 font-bold">Rank</p>
@@ -59,8 +58,9 @@ export default function CommitRank({ stats }: { stats: GitHubStats }) {
                         <div className="space-y-4 text-center transform translate-z-10">
                             <h2 className="text-lg text-zinc-400 font-medium tracking-wide uppercase">You reached the</h2>
                             <h1 className="text-5xl md:text-6xl font-black text-transparent bg-clip-text bg-gradient-to-br from-white via-white to-white/40">
-                                {stats.commitRank}
+                                {stats.rankTitle || stats.commitRank}
                             </h1>
+                            <p className="text-sm text-zinc-500 font-mono">{stats.commitRank}</p>
                         </div>
 
                         <div className="space-y-4">

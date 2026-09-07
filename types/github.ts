@@ -29,6 +29,8 @@ export interface GitHubStats {
   longestStreak: number;
   totalCommits: number;
   commitRank: string;
+  rankTitle: string;
+  rankIcon: string;
   calendarData: ContributionDay[];
   mostActiveDay: {
     name: string;

@@ -9,6 +9,7 @@ import Intro from "./slides/Intro";
 import MostActiveDay from "./slides/MostActiveDay";
 import MostActiveMonth from "./slides/MostActiveMonth";
 import StarsEarned from "./slides/StarsEarned";
+import Heatmap from "./slides/Heatmap";
 import { WrappedSlide } from "@/types/wrapped";
 import type { GitHubStats } from "@/types/github";
 
@@ -44,6 +45,8 @@ export default function SlideRenderer({ slide, stats, onNext }: SlideRendererPro
             return <Persona {...common} />;
         case "achievements":
             return <Achievements {...common} />;
+        case "heatmap":
+            return <Heatmap {...common} />;
         default:
             return (
                 <div className="w-full h-full flex items-center justify-center bg-black text-white/50">
