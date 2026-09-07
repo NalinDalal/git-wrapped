@@ -4,7 +4,7 @@ import {useState, useEffect, useCallback, useRef} from "react";
 import {useRouter} from "next/navigation";
 import {AnimatePresence, motion} from "motion/react";
 import SlideRenderer from "@/components/SlideRenderer";
-import {X, Pause, RotateCcw, Home} from "lucide-react";
+import {X, Pause, RotateCcw, Home, Share2, Twitter, Link, Check} from "lucide-react";
 import type { WrappedConfig } from "@/types/wrapped";
 import type { GitHubStats } from "@/types/github";
 
@@ -17,6 +17,7 @@ export default function WrappedPage() {
     const [currentSlideIndex, setCurrentSlideIndex] = useState(0);
     const [isPaused, setIsPaused] = useState(false);
     const [isFinished, setIsFinished] = useState(false);
+    const [copied, setCopied] = useState(false);
 
     const progressRef = useRef<HTMLDivElement>(null);
     const startTimeRef = useRef<number>(0);
@@ -197,12 +198,33 @@ export default function WrappedPage() {
 
     // --- Finished Screen ---
     if (isFinished) {
+        const shareText = `I made ${data.stats.totalCommits.toLocaleString()} contributions this year on GitHub! My rank: ${data.stats.rankTitle} ${data.stats.rankIcon}\n\nCheck out Git Wrapped:`;
+        const shareUrl = typeof window !== "undefined" ? window.location.origin : "";
+
+        const handleNativeShare = async () => {
+            if (navigator.share) {
+                try {
+                    await navigator.share({ title: "Git Wrapped", text: shareText, url: shareUrl });
+                } catch {}
+            }
+        };
+
+        const handleCopyLink = async () => {
+            try {
+                await navigator.clipboard.writeText(`${shareText}\n${shareUrl}`);
+                setCopied(true);
+                setTimeout(() => setCopied(false), 2000);
+            } catch {}
+        };
+
+        const hasNativeShare = typeof navigator !== "undefined" && !!navigator.share;
+
         return (
             <main className="fixed inset-0 bg-[#050505] overflow-hidden font-sans flex items-center justify-center">
                 <motion.div
                     initial={{ opacity: 0, scale: 0.9 }}
                     animate={{ opacity: 1, scale: 1 }}
-                    className="text-center space-y-8 px-6"
+                    className="text-center space-y-8 px-6 max-w-lg"
                 >
                     <div className="space-y-2">
                         <motion.p
@@ -231,10 +253,72 @@ export default function WrappedPage() {
                         </motion.p>
                     </div>
 
+                    {/* Stat highlights */}
                     <motion.div
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
-                        transition={{ delay: 0.7 }}
+                        transition={{ delay: 0.6 }}
+                        className="flex justify-center gap-6 text-center"
+                    >
+                        <div>
+                            <p className="text-2xl font-black text-white">{data.stats.longestStreak}</p>
+                            <p className="text-xs text-white/30 uppercase">Day Streak</p>
+                        </div>
+                        <div className="w-px bg-white/10" />
+                        <div>
+                            <p className="text-2xl font-black text-white">{data.stats.rankIcon}</p>
+                            <p className="text-xs text-white/30 uppercase">{data.stats.rankTitle}</p>
+                        </div>
+                        <div className="w-px bg-white/10" />
+                        <div>
+                            <p className="text-2xl font-black text-white">{data.stats.topLanguages?.[0] || "N/A"}</p>
+                            <p className="text-xs text-white/30 uppercase">Top Lang</p>
+                        </div>
+                    </motion.div>
+
+                    {/* Share buttons */}
+                    <motion.div
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: 0.8 }}
+                        className="space-y-3"
+                    >
+                        <p className="text-xs text-white/20 uppercase tracking-widest">Share your wrapped</p>
+                        <div className="flex justify-center gap-2">
+                            {hasNativeShare && (
+                                <button
+                                    onClick={handleNativeShare}
+                                    onPointerDown={(e) => e.stopPropagation()}
+                                    className="flex items-center gap-2 px-4 py-2.5 bg-white/10 text-white text-sm font-medium rounded-xl hover:bg-white/20 transition-colors border border-white/10"
+                                >
+                                    <Share2 className="w-4 h-4" />
+                                    Share
+                                </button>
+                            )}
+                            <button
+                                onClick={() => window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText)}&url=${encodeURIComponent(shareUrl)}`, "_blank")}
+                                onPointerDown={(e) => e.stopPropagation()}
+                                className="flex items-center gap-2 px-4 py-2.5 bg-white/10 text-white text-sm font-medium rounded-xl hover:bg-white/20 transition-colors border border-white/10"
+                            >
+                                <Twitter className="w-4 h-4" />
+                                Twitter
+                            </button>
+                            <button
+                                onClick={handleCopyLink}
+                                onPointerDown={(e) => e.stopPropagation()}
+                                className="flex items-center gap-2 px-4 py-2.5 bg-white/10 text-white text-sm font-medium rounded-xl hover:bg-white/20 transition-colors border border-white/10"
+                            >
+                                {copied ? <Check className="w-4 h-4 text-green-400" /> : <Link className="w-4 h-4" />}
+                                {copied ? "Copied" : "Copy"}
+                            </button>
+                        </div>
+                    </motion.div>
+
+                    {/* Action buttons */}
+                    <motion.div
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: 1 }}
                         className="flex flex-col sm:flex-row gap-3 justify-center"
                     >
                         <button
