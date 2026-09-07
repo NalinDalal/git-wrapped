@@ -4,16 +4,19 @@ import {useState, useEffect, useCallback, useRef} from "react";
 import {useRouter} from "next/navigation";
 import {AnimatePresence, motion} from "motion/react";
 import SlideRenderer from "@/components/SlideRenderer";
-import {X, Pause} from "lucide-react";
+import {X, Pause, RotateCcw, Home} from "lucide-react";
 import type { WrappedConfig } from "@/types/wrapped";
 import type { GitHubStats } from "@/types/github";
 
 const SLIDE_DURATION = 5000;
+const SWIPE_THRESHOLD = 50;
+
 export default function WrappedPage() {
     const router = useRouter();
     const [data, setData] = useState<{ stats: GitHubStats; config: WrappedConfig } | null>(null);
     const [currentSlideIndex, setCurrentSlideIndex] = useState(0);
     const [isPaused, setIsPaused] = useState(false);
+    const [isFinished, setIsFinished] = useState(false);
 
     const progressRef = useRef<HTMLDivElement>(null);
     const startTimeRef = useRef<number>(0);
@@ -22,6 +25,7 @@ export default function WrappedPage() {
     const animationFrameRef = useRef<number>(0);
 
     const pointerStartRef = useRef({x: 0, y: 0});
+    const touchStartRef = useRef({x: 0, y: 0, time: 0});
 
     useEffect(() => {
         const stats = sessionStorage.getItem("wrappedStats");
@@ -36,7 +40,6 @@ export default function WrappedPage() {
                 stats: JSON.parse(stats),
                 config: JSON.parse(config),
             };
-            // Use queueMicrotask to defer state update
             queueMicrotask(() => setData(parsed));
         } catch (e) {
             console.error(e);
@@ -54,15 +57,16 @@ export default function WrappedPage() {
             progressRef.current.style.width = "0%";
         }
     };
+
     const goToNext = useCallback(() => {
         if (!data) return;
         if (currentSlideIndex < data.config.slides.length - 1) {
             setCurrentSlideIndex((prev) => prev + 1);
             resetTimer();
         } else {
-            router.push("/");
+            setIsFinished(true);
         }
-    }, [currentSlideIndex, data, router]);
+    }, [currentSlideIndex, data]);
 
     const goToPrev = useCallback(() => {
         if (currentSlideIndex > 0) {
@@ -71,9 +75,15 @@ export default function WrappedPage() {
         }
     }, [currentSlideIndex]);
 
+    const handleReplay = useCallback(() => {
+        setIsFinished(false);
+        setCurrentSlideIndex(0);
+        resetTimer();
+    }, []);
 
+    // Auto-advance timer
     useEffect(() => {
-        if (!data || isPaused) return;
+        if (!data || isPaused || isFinished) return;
 
         const loop = () => {
             const now = Date.now();
@@ -93,14 +103,13 @@ export default function WrappedPage() {
 
         animationFrameRef.current = requestAnimationFrame(loop);
         return () => cancelAnimationFrame(animationFrameRef.current);
-    }, [isPaused, currentSlideIndex, data, goToNext]);
+    }, [isPaused, currentSlideIndex, data, goToNext, isFinished]);
 
-
+    // Tap navigation (desktop)
     const handlePointerDown = (e: React.PointerEvent) => {
         setIsPaused(true);
         pauseStartRef.current = Date.now();
         pointerStartRef.current = {x: e.clientX, y: e.clientY};
-
         cancelAnimationFrame(animationFrameRef.current);
     };
 
@@ -115,11 +124,45 @@ export default function WrappedPage() {
 
         if (pauseDuration < 200 && isTap) {
             const screenWidth = window.innerWidth;
-
             if (e.clientX < screenWidth * 0.3) {
                 goToPrev();
             } else {
                 goToNext();
+            }
+        }
+    };
+
+    // Swipe navigation (mobile)
+    const handleTouchStart = (e: React.TouchEvent) => {
+        const touch = e.touches[0];
+        touchStartRef.current = {x: touch.clientX, y: touch.clientY, time: Date.now()};
+        setIsPaused(true);
+        pauseStartRef.current = Date.now();
+        cancelAnimationFrame(animationFrameRef.current);
+    };
+
+    const handleTouchEnd = (e: React.TouchEvent) => {
+        setIsPaused(false);
+        const pauseDuration = Date.now() - pauseStartRef.current;
+        pausedTimeRef.current += pauseDuration;
+
+        const touch = e.changedTouches[0];
+        const deltaX = touch.clientX - touchStartRef.current.x;
+        const deltaY = touch.clientY - touchStartRef.current.y;
+        const deltaTime = Date.now() - touchStartRef.current.time;
+
+        // Only register as swipe if horizontal movement > threshold,
+        // horizontal > vertical, and it was quick
+        const isHorizontalSwipe =
+            Math.abs(deltaX) > SWIPE_THRESHOLD &&
+            Math.abs(deltaX) > Math.abs(deltaY) * 1.5 &&
+            deltaTime < 500;
+
+        if (isHorizontalSwipe) {
+            if (deltaX < 0) {
+                goToNext();
+            } else {
+                goToPrev();
             }
         }
     };
@@ -152,13 +195,77 @@ export default function WrappedPage() {
 
     if (!data) return null;
 
-    return (
-        <main
-            className="fixed inset-0 bg-black overflow-hidden font-sans select-none touch-none"
-        >
+    // --- Finished Screen ---
+    if (isFinished) {
+        return (
+            <main className="fixed inset-0 bg-[#050505] overflow-hidden font-sans flex items-center justify-center">
+                <motion.div
+                    initial={{ opacity: 0, scale: 0.9 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    className="text-center space-y-8 px-6"
+                >
+                    <div className="space-y-2">
+                        <motion.p
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            transition={{ delay: 0.2 }}
+                            className="text-sm font-bold text-white/30 uppercase tracking-widest"
+                        >
+                            That&apos;s a wrap
+                        </motion.p>
+                        <motion.h1
+                            initial={{ opacity: 0, y: 20 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ delay: 0.3 }}
+                            className="text-5xl md:text-6xl font-black text-white tracking-tighter"
+                        >
+                            @{data.stats.username || "developer"}
+                        </motion.h1>
+                        <motion.p
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            transition={{ delay: 0.5 }}
+                            className="text-lg text-white/40"
+                        >
+                            {data.stats.totalCommits.toLocaleString()} contributions this year
+                        </motion.p>
+                    </div>
 
+                    <motion.div
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: 0.7 }}
+                        className="flex flex-col sm:flex-row gap-3 justify-center"
+                    >
+                        <button
+                            onClick={handleReplay}
+                            onPointerDown={(e) => e.stopPropagation()}
+                            className="flex items-center gap-2 px-6 py-3 bg-white text-black font-bold rounded-xl hover:bg-gray-200 transition-colors"
+                        >
+                            <RotateCcw className="w-4 h-4" />
+                            Play Again
+                        </button>
+                        <button
+                            onClick={() => router.push("/")}
+                            onPointerDown={(e) => e.stopPropagation()}
+                            className="flex items-center gap-2 px-6 py-3 bg-white/10 text-white font-bold rounded-xl hover:bg-white/20 transition-colors border border-white/10"
+                        >
+                            <Home className="w-4 h-4" />
+                            Home
+                        </button>
+                    </motion.div>
+                </motion.div>
+            </main>
+        );
+    }
+
+    // --- Slideshow ---
+    return (
+        <main className="fixed inset-0 bg-black overflow-hidden font-sans select-none touch-none">
+
+            {/* Progress bars */}
             <div className="absolute top-0 left-0 right-0 z-50 p-4 pt-6 flex gap-2 pointer-events-none">
-                {data.config.slides.map((slide, index) => (
+                {data.config.slides.map((_, index) => (
                     <div key={index} className="h-1 flex-1 bg-white/10 rounded-full overflow-hidden">
                         <div
                             ref={index === currentSlideIndex ? progressRef : null}
@@ -172,6 +279,7 @@ export default function WrappedPage() {
                 ))}
             </div>
 
+            {/* Paused indicator + Close button */}
             <div className="absolute top-8 left-4 right-4 z-50 flex justify-between items-center pointer-events-none">
                 <div
                     className={`flex items-center gap-2 px-3 py-1 rounded-full bg-black/50 backdrop-blur-md border border-white/10 transition-all duration-300 ${isPaused ? "opacity-100 translate-y-0" : "opacity-0 -translate-y-2"}`}>
@@ -191,10 +299,13 @@ export default function WrappedPage() {
                 </button>
             </div>
 
+            {/* Slide area */}
             <div
                 className="relative z-0 w-full h-full flex items-center justify-center cursor-pointer"
                 onPointerDown={handlePointerDown}
                 onPointerUp={handlePointerUp}
+                onTouchStart={handleTouchStart}
+                onTouchEnd={handleTouchEnd}
                 onPointerLeave={() => {
                     setIsPaused(false);
                     const pauseDuration = Date.now() - pauseStartRef.current;
