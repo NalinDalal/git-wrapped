@@ -1,10 +1,16 @@
 "use client";
 import { motion } from "motion/react";
-import { useState, useMemo } from "react";
+import { useState, useMemo, useRef, useCallback } from "react";
+import { toPng } from "html-to-image";
+import { Download } from "lucide-react";
 import type { GitHubStats } from "@/types/github";
 
 export default function Summary({ stats }: { stats: GitHubStats }) {
     const [mode, setMode] = useState<"card" | "receipt">("card");
+    const cardRef = useRef<HTMLDivElement>(null);
+    const receiptRef = useRef<HTMLDivElement>(null);
+    const [downloading, setDownloading] = useState(false);
+
     const barcodeBars = useMemo(() =>
         Array.from({ length: 20 }, (_, i) => ({
             width: i % 3 === 0 ? 4 : 2,
@@ -12,27 +18,58 @@ export default function Summary({ stats }: { stats: GitHubStats }) {
         })),
     []);
 
+    const handleDownload = useCallback(async () => {
+        const node = mode === "card" ? cardRef.current : receiptRef.current;
+        if (!node || downloading) return;
+
+        setDownloading(true);
+        try {
+            const dataUrl = await toPng(node, {
+                pixelRatio: 3,
+                backgroundColor: mode === "receipt" ? "#ffffff" : "#050505",
+            });
+            const link = document.createElement("a");
+            link.download = `git-wrapped-${stats.username || "user"}.png`;
+            link.href = dataUrl;
+            link.click();
+        } catch (err) {
+            console.error("Download failed:", err);
+        }
+        setDownloading(false);
+    }, [mode, downloading, stats.username]);
+
     return (
         <div className="w-full h-full flex flex-col items-center justify-center bg-[#050505] p-6 relative">
 
-            {/* Mode Toggle */}
-            <div className="absolute top-16 right-6 z-[60] flex bg-white/10 rounded-full p-1 backdrop-blur-md">
+            {/* Mode Toggle + Download */}
+            <div className="absolute top-16 right-6 z-[60] flex items-center gap-2">
                 <button
-                    onClick={() => setMode("card")}
+                    onClick={handleDownload}
                     onPointerDown={(e) => e.stopPropagation()}
-                    aria-pressed={mode === "card"}
-                    className={`px-4 py-1.5 rounded-full text-xs font-bold transition-all ${mode === "card" ? "bg-white text-black" : "text-white/50"}`}
+                    disabled={downloading}
+                    className="p-2 rounded-full bg-white/10 text-white/50 hover:text-white hover:bg-white/20 transition-colors backdrop-blur-md disabled:opacity-50"
+                    aria-label="Download as image"
                 >
-                    Card
+                    <Download className="w-4 h-4" />
                 </button>
-                <button
-                    onClick={() => setMode("receipt")}
-                    onPointerDown={(e) => e.stopPropagation()}
-                    aria-pressed={mode === "receipt"}
-                    className={`px-4 py-1.5 rounded-full text-xs font-bold transition-all ${mode === "receipt" ? "bg-white text-black" : "text-white/50"}`}
-                >
-                    Receipt
-                </button>
+                <div className="flex bg-white/10 rounded-full p-1 backdrop-blur-md">
+                    <button
+                        onClick={() => setMode("card")}
+                        onPointerDown={(e) => e.stopPropagation()}
+                        aria-pressed={mode === "card"}
+                        className={`px-4 py-1.5 rounded-full text-xs font-bold transition-all ${mode === "card" ? "bg-white text-black" : "text-white/50"}`}
+                    >
+                        Card
+                    </button>
+                    <button
+                        onClick={() => setMode("receipt")}
+                        onPointerDown={(e) => e.stopPropagation()}
+                        aria-pressed={mode === "receipt"}
+                        className={`px-4 py-1.5 rounded-full text-xs font-bold transition-all ${mode === "receipt" ? "bg-white text-black" : "text-white/50"}`}
+                    >
+                        Receipt
+                    </button>
+                </div>
             </div>
 
             {mode === "card" ? (
@@ -48,7 +85,7 @@ export default function Summary({ stats }: { stats: GitHubStats }) {
                     <div className="absolute inset-[-50%] animate-[spin_4s_linear_infinite] bg-[conic-gradient(from_90deg_at_50%_50%,#00000000_50%,#4ade80_100%)] opacity-70" />
 
                     {/* Card Content */}
-                    <div className="absolute inset-[2px] bg-[#0A0A0A] rounded-[1.9rem] p-8 flex flex-col justify-between">
+                    <div ref={cardRef} className="absolute inset-[2px] bg-[#0A0A0A] rounded-[1.9rem] p-8 flex flex-col justify-between">
 
                         {/* Header */}
                         <div className="flex items-center gap-3 border-b border-white/10 pb-6">
@@ -98,63 +135,64 @@ export default function Summary({ stats }: { stats: GitHubStats }) {
                     key="receipt"
                     initial={{ y: 50, opacity: 0 }}
                     animate={{ y: 0, opacity: 1 }}
-                    className="bg-white text-black font-mono p-6 w-full max-w-sm shadow-2xl relative"
-                    style={{ filter: "drop-shadow(0 0 10px rgba(255,255,255,0.2))" }}
+                    className="relative"
                 >
-                    {/* Jagged Top */}
-                    <div className="absolute -top-2 left-0 w-full h-4 bg-white" style={{ clipPath: "polygon(0 100%, 5% 0, 10% 100%, 15% 0, 20% 100%, 25% 0, 30% 100%, 35% 0, 40% 100%, 45% 0, 50% 100%, 55% 0, 60% 100%, 65% 0, 70% 100%, 75% 0, 80% 100%, 85% 0, 90% 100%, 95% 0, 100% 100%)" }} />
+                    <div ref={receiptRef} className="bg-white text-black font-mono p-6 w-full max-w-sm shadow-2xl relative">
+                        {/* Jagged Top */}
+                        <div className="absolute -top-2 left-0 w-full h-4 bg-white" style={{ clipPath: "polygon(0 100%, 5% 0, 10% 100%, 15% 0, 20% 100%, 25% 0, 30% 100%, 35% 0, 40% 100%, 45% 0, 50% 100%, 55% 0, 60% 100%, 65% 0, 70% 100%, 75% 0, 80% 100%, 85% 0, 90% 100%, 95% 0, 100% 100%)" }} />
 
-                    <div className="text-center mb-6 mt-4">
-                        <h2 className="text-2xl font-black uppercase tracking-tighter">Git Wrapped</h2>
-                        <p className="text-xs uppercase">{new Date().getFullYear()} Order #001</p>
-                        <p className="text-xs">Served to: Developer</p>
-                    </div>
+                        <div className="text-center mb-6 mt-4">
+                            <h2 className="text-2xl font-black uppercase tracking-tighter">Git Wrapped</h2>
+                            <p className="text-xs uppercase">{new Date().getFullYear()} Order #001</p>
+                            <p className="text-xs">Served to: Developer</p>
+                        </div>
 
-                    <div className="border-t-2 border-dashed border-black/20 py-4 space-y-2 text-sm uppercase">
-                        <div className="flex justify-between">
-                            <span>Total Commits</span>
-                            <span className="font-bold">{stats.totalCommits}</span>
-                        </div>
-                        <div className="flex justify-between">
-                            <span>Day Streak</span>
-                            <span className="font-bold">{stats.longestStreak}</span>
-                        </div>
-                        <div className="flex justify-between">
-                            <span>Active Month</span>
-                            <span className="font-bold">{stats.mostActiveMonth?.name || "N/A"}</span>
-                        </div>
-                        <div className="flex justify-between">
-                            <span>Top Lang</span>
-                            <span className="font-bold">{stats.topLanguages?.[0] || "N/A"}</span>
-                        </div>
-                        <div className="flex justify-between text-black/50">
-                            <span>Sleep Lost</span>
-                            <span>∞</span>
-                        </div>
-                    </div>
-
-                    <div className="border-t-2 border-dashed border-black/20 pt-4 pb-8 text-center">
-                        <p className="text-3xl font-black">{stats.commitRank}</p>
-                        <p className="text-[10px] mt-2">THANK YOU FOR CODING</p>
-                        <div className="mt-4 flex justify-center opacity-80">
-                            <div className="h-8 w-48 flex gap-1 justify-center">
-                                {barcodeBars.map((bar, i) => (
-                                    <div
-                                        key={i}
-                                        className="bg-black"
-                                        style={{
-                                            width: bar.width,
-                                            height: "100%",
-                                            opacity: bar.opacity,
-                                        }}
-                                    />
-                                ))}
+                        <div className="border-t-2 border-dashed border-black/20 py-4 space-y-2 text-sm uppercase">
+                            <div className="flex justify-between">
+                                <span>Total Commits</span>
+                                <span className="font-bold">{stats.totalCommits}</span>
+                            </div>
+                            <div className="flex justify-between">
+                                <span>Day Streak</span>
+                                <span className="font-bold">{stats.longestStreak}</span>
+                            </div>
+                            <div className="flex justify-between">
+                                <span>Active Month</span>
+                                <span className="font-bold">{stats.mostActiveMonth?.name || "N/A"}</span>
+                            </div>
+                            <div className="flex justify-between">
+                                <span>Top Lang</span>
+                                <span className="font-bold">{stats.topLanguages?.[0] || "N/A"}</span>
+                            </div>
+                            <div className="flex justify-between text-black/50">
+                                <span>Sleep Lost</span>
+                                <span>∞</span>
                             </div>
                         </div>
-                    </div>
 
-                    {/* Jagged Bottom */}
-                    <div className="absolute -bottom-2 left-0 w-full h-4 bg-white" style={{ clipPath: "polygon(0 0, 5% 100%, 10% 0, 15% 100%, 20% 0, 25% 100%, 30% 0, 35% 100%, 40% 0, 45% 100%, 50% 0, 55% 100%, 60% 0, 65% 100%, 70% 0, 75% 100%, 80% 0, 85% 100%, 90% 0, 95% 100%, 100% 0)" }} />
+                        <div className="border-t-2 border-dashed border-black/20 pt-4 pb-8 text-center">
+                            <p className="text-3xl font-black">{stats.commitRank}</p>
+                            <p className="text-[10px] mt-2">THANK YOU FOR CODING</p>
+                            <div className="mt-4 flex justify-center opacity-80">
+                                <div className="h-8 w-48 flex gap-1 justify-center">
+                                    {barcodeBars.map((bar, i) => (
+                                        <div
+                                            key={i}
+                                            className="bg-black"
+                                            style={{
+                                                width: bar.width,
+                                                height: "100%",
+                                                opacity: bar.opacity,
+                                            }}
+                                        />
+                                    ))}
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Jagged Bottom */}
+                        <div className="absolute -bottom-2 left-0 w-full h-4 bg-white" style={{ clipPath: "polygon(0 0, 5% 100%, 10% 0, 15% 100%, 20% 0, 25% 100%, 30% 0, 35% 100%, 40% 0, 45% 100%, 50% 0, 55% 100%, 60% 0, 65% 100%, 70% 0, 75% 100%, 80% 0, 85% 100%, 90% 0, 95% 100%, 100% 0)" }} />
+                    </div>
                 </motion.div>
             )}
         </div>
